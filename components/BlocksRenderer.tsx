@@ -18,17 +18,17 @@ const isReadMore = (b: AnyBlock) =>
 
 function TitleView({ block }: { block: AnyBlock }) {
   return (
-    <h2 className="font-medium xl:text-[42px] xl:leading-[55px] 2xl:text-[48px] 2xl:leading-[70.5px] uppercase text-[#131313] text-center whitespace-pre-line">
+    <h2 className="font-medium text-[24px] md:text-[26px] lg:text-[30px] xl:text-[42px] 2xl:text-[48px] md:leading-[38px] lg:leading-[40px] xl:leading-[55px] 2xl:leading-[70.5px] uppercase text-[#131313] text-center whitespace-pre-line">
       {String(block?.title ?? '').replace(/\\n/g, '\n')}
     </h2>
   )
 }
 
 function ParagraphView({ block }: { block: AnyBlock }) {
-  const weightClass = block?.strong ? 'font-medium' : 'font-normal'
+  const weightClass = block?.strong ? 'md:text-[20px] font-medium' : 'font-normal'
   // теж компенсація для потоку, щоб не було перекриття
   return (
-    <p className={`xl:text-[20px] 2xl:text-[26px] ${weightClass} leading-[39px] text-[#878787] text-center whitespace-pre-line tracking-[-0.03px] `}>
+    <p className={`text-[14px] md:text-[16px] lg:text-[18px] xl:text-[20px] 2xl:text-[26px] ${weightClass} leading-[23px] md:leading-[25px] xl:leading-[34px] 2xl:leading-[39px] text-[#878787] text-center whitespace-pre-line tracking-[-0.03px] `}>
       {block?.paragraph}
     </p>
   )
@@ -43,7 +43,7 @@ export default function BlocksRenderer({ content }: { content: AnyBlock[] }) {
   const after = idx === -1 ? [] : content.slice(idx + 1)
 
   return (
-    <div className="flex flex-col gap-[27px]">
+    <div className="flex flex-col gap-[9px] md:gap-[10px] lg:gap-[27px] xl:gap-[20px] 2xl:gap-[27px]">
       {/* ДО кнопки — звичайний контент */}
       {before.map((block, i) => {
         if (isTitle(block)) return <TitleView key={`b-${i}`} block={block} />
@@ -63,7 +63,7 @@ export default function BlocksRenderer({ content }: { content: AnyBlock[] }) {
             transition={{ duration: 0.3, ease: 'easeOut' }}
             className="overflow-hidden" // без mt — щільно прилягає
           >
-            <div className="flex flex-col gap-[27px]">
+            <div className="flex flex-col gap-[9px] md:gap-[10px] lg:gap-[27px] xl:gap-[20px] 2xl:gap-[27px]">
               {after.map((block, i) => {
                 const key = `tail-${i}`
                 if (isTitle(block)) return <TitleView key={key} block={block} />
@@ -81,7 +81,7 @@ export default function BlocksRenderer({ content }: { content: AnyBlock[] }) {
           <button
             type="button"
             onClick={() => setOpen(v => !v)}
-            className="mt-3 outline-none uppercase flex items-center gap-4 text-[26px] font-medium text-[#131313] transition leading-[165%]"
+            className="md:mt-[28px] lg:mt-3 outline-none uppercase flex items-center gap-4 md:text-[16px] lg:text-[20px] 2xl:text-[26px] font-medium text-[#131313] transition leading-[165%]"
             aria-expanded={open}
             aria-controls="readmore-content"
           >

@@ -40,29 +40,33 @@ function SocialIcon({ type }: { type: 'facebook' | 'instagram' | 'x' }): JSX.Ele
 
 export default function Footer(): JSX.Element {
   return (
-    <footer className="bg-[#131313] text-white">
+    <footer className="bg-[#131313] text-white 2xl:mt-[120px]">
       {/* Top area */}
-      <div className="mx-auto w-full max-w-[1824px] px-12 pt-10 pb-6">
-        <div className="grid gap-8 md:grid-cols-[auto_1fr] items-start">
-          <div className="shrink-0">
-            <Image src="/images/logo.svg" alt="GA Home Design" width={200} height={60} />
+      <div className="mx-auto w-full max-w-[1920px] p-12">
+        <div className="flex justify-between">
+          <div className="">
+            <Image src="/images/logo.svg" alt="GA Home Design" width={206} height={100}/>
           </div>
           <nav className="justify-self-end w-full max-w-[980px]">
-            <ul className="grid grid-cols-1 gap-y-4 text-right md:grid-cols-3 md:gap-x-[80px]">
-              {navItems.map((label) => (
-                <li key={label} className="text-base font-semibold uppercase tracking-wide">
-                  {label}
-                </li>
-              ))}
-            </ul>
+           <ul className="flex flex-wrap justify-end gap-y-12 gap-x-[100px] text-right">
+  {navItems.map((label) => (
+    <li
+      key={label}
+      className="text-[24px] leading-[23px] font-medium uppercase w-[213px] text-right"
+    >
+      {label}
+    </li>
+  ))}
+</ul>
+
           </nav>
         </div>
-        <div className="mt-6 h-px w-full bg-[#4C4C4C]" />
+        <div className="mt-12 h-px w-full bg-[#4C4C4C]" />
       </div>
 
       {/* Bottom area */}
-      <div className="mx-auto flex w-full max-w-[1824px] items-center justify-between px-12 pb-10">
-        <p className="text-[#B7B7B7] text-[16px] md:text-[18px]">2025 Ga Home Design. All rights reserved.</p>
+      <div className="mx-auto flex w-full max-w-[1920px] items-center justify-between px-12 pb-12">
+        <p className="text-[#B7B7B7] text-[16px] 2xl:text-[26px] 2xl:leading-[18px]">2025 Ga Home Design. All rights reserved.</p>
         <div className="flex items-center gap-4">
           <SocialIcon type="facebook" />
           <SocialIcon type="instagram" />

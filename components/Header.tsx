@@ -2,15 +2,15 @@ import Image from 'next/image'
 import type { JSX } from 'react'
 
 const leftLinks = [
-  'BEST LOCATION',
-  'MORTGAGE',
-  '3D VISUALISATION',
+  { label: 'BEST LOCATION', href: '/location' },
+  { label: 'MORTGAGE', href: '/mortgage' },
+  { label: '3D VISUALISATION', href: '/visualisation' },
 ]
 
 const rightLinks = [
-  'DOUBLE SAVINGS',
-  'HAPPY OWNERS',
-  'INNOVATIONS',
+  { label: 'DOUBLE SAVINGS', href: '/savings' },
+  { label: 'HAPPY OWNERS', href: '/owners' },
+  { label: 'INNOVATIONS', href: '/innovations' },
 ]
 
 export default function Header(): JSX.Element {
@@ -49,10 +49,10 @@ export default function Header(): JSX.Element {
           {/* Left nav */}
           <nav className="flex-1">
             <ul className="flex items-center gap-[50px] 2xl:gap-[80px]">
-              {leftLinks.map((label) => (
+              {leftLinks.map(({ label, href }) => (
                 <li key={label}>
                   <a
-                    href="#"
+                    href={href}
                     className="text-[18px] 2xl:text-[24px] leading-[13px] 2xl:leading-[20px] font-medium uppercase"
                   >
                     {label}
@@ -78,10 +78,10 @@ export default function Header(): JSX.Element {
           {/* Right nav */}
           <nav className="flex-1 flex justify-end">
             <ul className="flex items-center gap-[50px] 2xl:gap-[80px]">
-              {rightLinks.map((label) => (
+              {rightLinks.map(({ label, href }) => (
                 <li key={label}>
                   <a
-                    href="#"
+                    href={href}
                     className="text-[18px] 2xl:text-[24px] leading-[13px] 2xl:leading-[20px] font-medium uppercase"
                   >
                     {label}

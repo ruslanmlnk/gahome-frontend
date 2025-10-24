@@ -22,7 +22,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
   if (!page) return null
 
   return (
-    <main className="container text-center mx-auto xl:px-[134px] 2xl:px-[200px] xl:py-[75px] 2xl:py-[102px] flex flex-col gap-[27px] xl:max-w-[1440px] 2xl:max-w-[1920px]">
+    <main className="container text-center mx-auto px-[16px] md:px-[86px] lg:px-[107px] xl:px-[134px] 2xl:px-[200px] py-[22px] md:py-[37px] lg:py-[46px] xl:py-[75px] 2xl:py-[102px] flex flex-col 2xl:max-w-[1920px]">
       <BlocksRenderer content={Array.isArray(page.content) ? page.content : []} />
     </main>
   )

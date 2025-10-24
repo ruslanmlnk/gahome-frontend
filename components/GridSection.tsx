@@ -5,8 +5,8 @@ import type { JSX } from 'react'
 
 export default function GridSection(): JSX.Element {
     return (
-        <section className='w-full 2xl:max-w-[1920px] xl:max-w-[1440px] lg:max-w-[1024px] mx-auto 2xl:pt-[15px] 2xl:pb-[120px] xl:pb-[85px] xl:pt-[10px] pt-[5px] lg:pb-[55px] grid gap-[5px] xl:gap-[10px] 2xl:gap-[15px]'>
-            <section className='w-full 2xl:h-[692px] xl:h-[480px] lg:h-[410px] md:h-[360px] relative'>
+        <section className='w-full 2xl:max-w-[1920px] xl:max-w-[1440px] lg:max-w-[1024px] mx-auto 2xl:pt-[15px] 2xl:pb-[120px] xl:pb-[85px] xl:pt-[10px] md:pt-[5px] pt-[32px] md:pb-[55px] pb-[55px] grid gap-[5px] xl:gap-[10px] 2xl:gap-[15px]'>
+            <section className='w-full 2xl:h-[692px] xl:h-[480px] lg:h-[410px] md:h-[360px] h-[312px] relative'>
                 <Image
                     src="/images/grid/1.png"
                     alt="GA Home Design"
@@ -15,8 +15,8 @@ export default function GridSection(): JSX.Element {
                     className='object-cover'
                 />
             </section>
-            <section className='w-full 2xl:h-[692px] xl:h-[480px] lg:h-[410px] md:h-[360px] flex 2xl:gap-[15px] xl:gap-[10px] gap-[5px]'>
-                <section className='w-1/2 flex flex-col gap-[10px] gap-[5px]'>
+            <section className='flex-col md:flex-row w-full 2xl:h-[692px] xl:h-[480px] lg:h-[410px] md:h-[360px] flex 2xl:gap-[15px] xl:gap-[10px] gap-[5px]'>
+                <section className='w-full h-[351px] md:h-auto md:w-1/2 flex flex-col xl:gap-[10px] gap-[5px] '>
                     {/* Wrapper для першої картинки */}
                     <div className='relative h-1/2'>
                         <Image
@@ -60,7 +60,7 @@ export default function GridSection(): JSX.Element {
                 </section>
 
                 {/* Wrapper для третьої картинки */}
-                <div className='relative w-1/2'>
+                <div className='relative w-full md:w-1/2 h-[173px] md:h-auto'>
                     <Image
                         src="/images/grid/4.png"
                         alt="GA Home Design"
@@ -79,7 +79,7 @@ export default function GridSection(): JSX.Element {
                     </div>
                 </div>
             </section>
-            <section className='w-full 2xl:h-[341px] xl:h-[235px] lg:h-[202.5px] md:h-[177.5px] relative'>
+            <section className='w-full 2xl:h-[341px] xl:h-[235px] lg:h-[202.5px] md:h-[177.5px] h-[173px] relative'>
                 <Image
                     src="/images/grid/5.png"
                     alt="GA Home Design"
@@ -98,8 +98,8 @@ export default function GridSection(): JSX.Element {
                 </div>
             </section>
 
-            <section className='w-full 2xl:h-[341px] xl:h-[235px] lg:h-[202.5px] md:h-[177.5px] flex 2xl:gap-[15px] xl:gap-[10px] gap-[5px]'>
-                <section className='relative w-1/2'>
+            <section className='w-full 2xl:h-[341px] xl:h-[235px] lg:h-[202.5px] md:h-[177.5px] flex flex-col md:flex-row 2xl:gap-[15px] xl:gap-[10px] gap-[5px]'>
+                <section className='relative w-full md:w-1/2 h-[173px] md:h-auto'>
                     <Image
                         src="/images/grid/6.jpg"
                         alt="GA Home Design"
@@ -119,7 +119,7 @@ export default function GridSection(): JSX.Element {
                 </section>
 
                 {/* Wrapper для третьої картинки */}
-                <div className='relative w-1/2'>
+                <div className='relative w-full md:w-1/2 h-[173px] md:h-auto'>
                     <Image
                         src="/images/grid/7.jpg"
                         alt="GA Home Design"

@@ -1,0 +1,43 @@
+query GetHome {
+  Home {
+    meta {
+      metaTitle
+      metaDescription
+    }
+  }
+}
+
+query GetPageBySlug($slug: String!) {
+  Pages(where: { slug: { equals: $slug } }) {
+    docs {
+      id
+      slug
+      meta {
+        metaTitle
+        metaDescription
+      }
+      content {
+        __typename
+        ... on Title {
+          title
+        }
+        ... on Paragraph {
+          paragraph
+          strong
+        }
+        ... on ReadMore {
+          label
+        }
+        ... on TextWithFile {
+          text
+          file { id filename url }
+        }
+        ... on Image {
+          image { id filename url }
+          alt
+        }
+      }
+    }
+  }
+}
+

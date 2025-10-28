@@ -8,8 +8,8 @@ import FIleDownload from '@/components/FileDownload'
 import VideoGrid from '@/components/VideoGrid'
 const sdk = getSdk(graphqlClient)
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const { slug } = (await params) as { slug: string }
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
   const res = await sdk.GetPageBySlug({ slug })
   const page = res?.Pages?.docs?.[0]
   return {
@@ -18,8 +18,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default async function Page({ params }: { params: { slug: string } }) {
-  const { slug } = (await params) as { slug: string }
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
   const res = await sdk.GetPageBySlug({ slug })
   const page = res?.Pages?.docs?.[0]
   if (!page) return null

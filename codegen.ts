@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import type { CodegenConfig } from '@graphql-codegen/cli'
 
-const schema = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT || 'http://localhost:3000/api/graphql'
+const schema = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT || 'http://admin.homegudzdesign.com/api/graphql'
 
 const config: CodegenConfig = {
   schema,

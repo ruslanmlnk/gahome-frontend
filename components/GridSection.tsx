@@ -20,13 +20,13 @@ type Props = {
 export default function GridSection({ gridSection }: Props) {
     //   if (!gridSection) return null
   const items = [
-    'http://localhost:3000' + gridSection?.item1?.image?.url ||"/images/grid/1.png",
-    'http://localhost:3000' + gridSection?.item2?.image?.url ||"/images/grid/2.png",
-    'http://localhost:3000' + gridSection?.item3?.image?.url ||"/images/grid/3.png",
-    'http://localhost:3000' + gridSection?.item4?.image?.url ||"/images/grid/4.png",
-    'http://localhost:3000' + gridSection?.item5?.image?.url ||"/images/grid/5.png",
-    'http://localhost:3000' + gridSection?.item6?.image?.url ||"/images/grid/6.jpg",
-    'http://localhost:3000' + gridSection?.item7?.image?.url ||"/images/grid/7.jpg",
+    'http://admin.homegudzdesign.com' + gridSection?.item1?.image?.url ||"/images/grid/1.png",
+    'http://admin.homegudzdesign.com' + gridSection?.item2?.image?.url ||"/images/grid/2.png",
+    'http://admin.homegudzdesign.com' + gridSection?.item3?.image?.url ||"/images/grid/3.png",
+    'http://admin.homegudzdesign.com' + gridSection?.item4?.image?.url ||"/images/grid/4.png",
+    'http://admin.homegudzdesign.com' + gridSection?.item5?.image?.url ||"/images/grid/5.png",
+    'http://admin.homegudzdesign.com' + gridSection?.item6?.image?.url ||"/images/grid/6.jpg",
+    'http://admin.homegudzdesign.com' + gridSection?.item7?.image?.url ||"/images/grid/7.jpg",
   ]
   const itemTitles = [
     gridSection?.item1?.title || "BEST LOCATION",

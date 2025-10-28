@@ -10,7 +10,6 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'admin.homegudzdesign.com',
-        port: '3000',
       },
     ],
   },

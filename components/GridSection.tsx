@@ -20,13 +20,13 @@ type Props = {
 export default function GridSection({ gridSection }: Props) {
     //   if (!gridSection) return null
   const items = [
-    'https://admin.homegudzdesign.com' + gridSection?.item1?.image?.url ||"/images/grid/1.png",
-    'https://admin.homegudzdesign.com' + gridSection?.item2?.image?.url ||"/images/grid/2.png",
-    'https://admin.homegudzdesign.com' + gridSection?.item3?.image?.url ||"/images/grid/3.png",
-    'https://admin.homegudzdesign.com' + gridSection?.item4?.image?.url ||"/images/grid/4.png",
-    'https://admin.homegudzdesign.com' + gridSection?.item5?.image?.url ||"/images/grid/5.png",
-    'https://admin.homegudzdesign.com' + gridSection?.item6?.image?.url ||"/images/grid/6.jpg",
-    'https://admin.homegudzdesign.com' + gridSection?.item7?.image?.url ||"/images/grid/7.jpg",
+    gridSection?.item1?.image?.url ||"/images/grid/1.png",
+    gridSection?.item2?.image?.url ||"/images/grid/2.png",
+    gridSection?.item3?.image?.url ||"/images/grid/3.png",
+    gridSection?.item4?.image?.url ||"/images/grid/4.png",
+    gridSection?.item5?.image?.url ||"/images/grid/5.png",
+    gridSection?.item6?.image?.url ||"/images/grid/6.jpg",
+    gridSection?.item7?.image?.url ||"/images/grid/7.jpg",
   ]
   const itemTitles = [
     gridSection?.item1?.title || "BEST LOCATION",

@@ -5,6 +5,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 
 type AnyBlock = Record<string, any>
 
+
+const defaultStyle = "container text-center mx-auto px-[16px] md:px-[86px] lg:px-[107px] xl:px-[123px] 2xl:px-[200px] flex flex-col 2xl:max-w-[1920px]";
 const getT = (b: AnyBlock) => String(b?.__typename ?? '').toLowerCase()
 
 const isTitle = (b: AnyBlock) =>
@@ -18,7 +20,7 @@ const isReadMore = (b: AnyBlock) =>
 
 function TitleView({ block }: { block: AnyBlock }) {
   return (
-    <h2 className="font-medium text-[24px] md:text-[26px] lg:text-[30px] xl:text-[42px] 2xl:text-[48px] md:leading-[38px] lg:leading-[40px] xl:leading-[55px] 2xl:leading-[70.5px] uppercase text-[#131313] text-center whitespace-pre-line">
+    <h2 className="font-medium text-[20px] md:text-[22px] lg:text-[26px] xl:text-[36px] md:leading-[38px] lg:leading-[40px] xl:leading-[55px] 2xl:leading-[70.5px] uppercase text-[#131313] text-center whitespace-pre-line">
       {String(block?.title ?? '').replace(/\\n/g, '\n')}
     </h2>
   )
@@ -43,14 +45,17 @@ export default function BlocksRenderer({ content }: { content: AnyBlock[] }) {
   const after = idx === -1 ? [] : content.slice(idx + 1)
 
   return (
-    <div className="flex flex-col gap-[9px] md:gap-[10px] lg:gap-[27px] xl:gap-[20px] 2xl:gap-[27px]">
+    <div className={`${defaultStyle} flex flex-col gap-[9px] md:gap-[14px] lg:gap-[27px] xl:gap-[20px] 2xl:gap-[19px]`}>
       {/* ДО кнопки — звичайний контент */}
-      {before.map((block, i) => {
-        if (isTitle(block)) return <TitleView key={`b-${i}`} block={block} />
-        if (isParagraph(block)) return <ParagraphView key={`b-${i}`} block={block} />
-        return null
-      })}
+      {/* <section className={defaultStyle}> */}
 
+        {before.map((block, i) => {
+          if (isTitle(block)) return <TitleView key={`b-${i}`} block={block} />
+          if (isParagraph(block)) return <ParagraphView key={`b-${i}`} block={block} />
+          return null
+        })}
+
+      {/* </section> */}
       {/* ПЕРЕД кнопкою — прихований контент з auto-height анімацією */}
       <AnimatePresence initial={false}>
         {hasReadMore && open && (
@@ -63,7 +68,7 @@ export default function BlocksRenderer({ content }: { content: AnyBlock[] }) {
             transition={{ duration: 0.3, ease: 'easeOut' }}
             className="overflow-hidden" // без mt — щільно прилягає
           >
-            <div className="flex flex-col gap-[9px] md:gap-[10px] lg:gap-[27px] xl:gap-[20px] 2xl:gap-[27px]">
+            <div className={`flex flex-col gap-[9px] md:gap-[14px] lg:gap-[27px] xl:gap-[20px] 2xl:gap-[19px] `}>
               {after.map((block, i) => {
                 const key = `tail-${i}`
                 if (isTitle(block)) return <TitleView key={key} block={block} />
@@ -71,6 +76,11 @@ export default function BlocksRenderer({ content }: { content: AnyBlock[] }) {
                 return null
               })}
             </div>
+            {/* <section className="px-4 md:px-6 xl:px-[36px] 2xl:px-12 mt-[37px] text-center text-white md:max-w-[768px] lg:max-w-[1024px] xl:max-w-[1440px] 2xl:max-w-[1920px] mx-auto">
+              <div className='bg-[#131313] text-[14px] md:text-[16px] lg:text-[18px] xl:text-[20px] 2xl:text-[26px] p-6 lg:py-12 2xl:px-[157px] lg:px-[48px] leading-[165%] lg:roundex-0 xl:rounded-[20px] 2xl:rounded-[0px]'>
+                <span className="font-medium">Disclaimer: </span>Program availability and requirements depend on your profile, property type, and lender policies. Switching between programs may require additional approvals or updated documentation. Our team manages this process end-to-end to keep you secure and informed.
+              </div>
+            </section> */}
           </motion.div>
         )}
       </AnimatePresence>
@@ -81,7 +91,7 @@ export default function BlocksRenderer({ content }: { content: AnyBlock[] }) {
           <button
             type="button"
             onClick={() => setOpen(v => !v)}
-            className="md:mt-[28px] lg:mt-3 outline-none uppercase flex items-center gap-4 md:text-[16px] lg:text-[20px] 2xl:text-[26px] font-medium text-[#131313] transition leading-[165%]"
+            className="mt-[16px] md:mt-[33px] lg:mt-[15px] outline-none uppercase flex items-center gap-4 md:text-[16px] lg:text-[20px] 2xl:text-[26px] font-medium text-[#131313] transition leading-[11px] lg:leading-[14px] lg:mt-7 2xl:leading-[18px] 2xl:mt-6"
             aria-expanded={open}
             aria-controls="readmore-content"
           >
@@ -95,7 +105,7 @@ export default function BlocksRenderer({ content }: { content: AnyBlock[] }) {
               className={`transition-transform duration-300 ${!open ? 'rotate-180' : ''}`}
               aria-hidden="true"
             >
-              <path d="M1.2981 9.60498L12.2981 1.60498L23.2981 9.60498" stroke="currentColor" strokeWidth="2.59579" strokeLinecap="round"/>
+              <path d="M1.2981 9.60498L12.2981 1.60498L23.2981 9.60498" stroke="currentColor" strokeWidth="2.59579" strokeLinecap="round" />
             </svg>
           </button>
         </div>

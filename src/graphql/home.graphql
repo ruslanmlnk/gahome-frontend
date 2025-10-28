@@ -4,6 +4,15 @@ query GetHome {
       metaTitle
       metaDescription
     }
+    gridSection {
+      item1 { title image { url alt } }
+      item2 { title image { url alt } }
+      item3 { title image { url alt } }
+      item4 { title image { url alt } }
+      item5 { title image { url alt } }
+      item6 { title image { url alt } }
+      item7 { title image { url alt } }
+    }
   }
 }
 
@@ -12,6 +21,31 @@ query GetPageBySlug($slug: String!) {
     docs {
       id
       slug
+      main_title
+      hero_image{
+        url
+      }
+      videos {
+          video_file{
+            url
+          }
+          poster {
+            url
+            width
+            height
+            alt
+          }
+        }
+      gridcont {
+        title
+        description
+      }
+      file_download{
+        text,
+        file{
+          url
+        }
+      }
       meta {
         metaTitle
         metaDescription
@@ -28,16 +62,20 @@ query GetPageBySlug($slug: String!) {
         ... on ReadMore {
           label
         }
-        ... on TextWithFile {
-          text
-          file { id filename url }
-        }
-        ... on Image {
-          image { id filename url }
-          alt
-        }
       }
     }
   }
 }
 
+mutation CreateLead(
+  $fullName: String!
+  $email: String!
+  $phone: String
+  $message: String!
+) {
+  createLead(
+    data: { fullName: $fullName, email: $email, phone: $phone, message: $message }
+  ) {
+    id
+  }
+}

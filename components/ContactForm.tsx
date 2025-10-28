@@ -1,19 +1,19 @@
-import type { FormEvent, JSX } from 'react'
+import type { JSX } from 'react'
+import { submitLead } from '@/src/actions/submitLead'
 
 type Props = {
-  onSubmit?: (e: FormEvent<HTMLFormElement>) => void
   titleLine1?: string
   titleLine2?: string
   description?: string
 }
 
 export default function ContactForm({
-  onSubmit,
   titleLine1 = 'HAVE QUESTIONS',
   titleLine2 = 'OR NEED ASSISTANCE?',
   description =
     'We’re here to help! Whether you have questions, need guidance, or require support, our team is ready to assist',
 }: Props): JSX.Element {
+
   return (
     <section className='w-full md:max-w-[768px] lg:max-w-[1024px] xl:max-w-[1440px] 2xl:max-w-[1920px] mx-auto 2xl:px-12 xl:px-9 md:px-6 px-4'>
       <div className='flex flex-col md:flex-row items-start gap-6 md:gap-9 2xl:gap-[15px]'>
@@ -31,14 +31,17 @@ export default function ContactForm({
 
       {/* Right form */}
       <div className='w-full md:w-1/2 border border-[#D9D9D9] p-6 xl:p-8 bg-white'>
-        <form className='flex flex-col gap-[24px] lg:gap-[28px] xl:gap-[32px] 2xl:gap-[33.377px]' onSubmit={onSubmit}>
+        <form className='flex flex-col gap-[24px] lg:gap-[28px] xl:gap-[32px] 2xl:gap-[33.377px]' noValidate={false} action={submitLead}>
           <div>
             <label htmlFor='fullName' className='block text-[#131313] text-[16px] lg:text-[18px] leading-[11px] xl:text-[20px] 2xl:text-[24px] font-medium mb-4 lg:leading-[13px] xl:leading-[14px] 2xl:leading-[17px]'>
               Full Name
             </label>
             <input
               id='fullName'
+              name="fullName"
               type='text'
+              minLength={2}
+              required
               placeholder='Enter your name'
               className='w-full 2xl:h-[62px] xl:h-[61px] lg:h-[51px] md:h-[50px] h-[42px] border border-[#E7E7E7] px-[16px] md:px-[24.09px] text-[#131313] placeholder:text-[#B7B7B7] outline-none focus:ring-1 focus:ring-black'
             />
@@ -50,6 +53,8 @@ export default function ContactForm({
             </label>
             <input
               id='email'
+              name="email"
+              required
               type='email'
               placeholder='Enter email adress'
               className='w-full 2xl:h-[62px] xl:h-[61px] lg:h-[51px] md:h-[50px] h-[42px] border border-[#E7E7E7] px-[16px] md:px-[24.09px] text-[#131313] placeholder:text-[#B7B7B7] outline-none focus:ring-1 focus:ring-black'
@@ -62,7 +67,10 @@ export default function ContactForm({
             </label>
             <input
               id='phone'
+              name="phone"
               type='tel'
+              
+              minLength={8}
               placeholder='Enter phone number'
               className='w-full 2xl:h-[62px] xl:h-[61px] lg:h-[51px] md:h-[50px] h-[42px] border border-[#E7E7E7] px-[16px] md:px-[24.09px] text-[#131313] placeholder:text-[#B7B7B7] outline-none focus:ring-1 focus:ring-black'
             />
@@ -74,6 +82,9 @@ export default function ContactForm({
             </label>
             <textarea
               id='message'
+              name="message"
+              required
+              minLength={20}
               placeholder='Write your message...'
               className='w-full h-[150px] md:h-[100px] lg:h-[150px] border border-[#E7E7E7] p-[16px] md:p-[24px] text-[#131313] placeholder:text-[#B7B7B7] outline-none focus:ring-1 focus:ring-black'
             />

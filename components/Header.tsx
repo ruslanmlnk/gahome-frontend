@@ -1,29 +1,35 @@
+'use client'
+import { Route } from 'next'
 import Image from 'next/image'
-import type { JSX } from 'react'
+import Link from 'next/link'
+import { useState, type JSX } from 'react'
 
-const leftLinks = [
-  { label: 'BEST LOCATION', href: '/location' },
-  { label: 'MORTGAGE', href: '/mortgage' },
-  { label: '3D VISUALISATION', href: '/visualisation' },
+const leftLinks: { label: string; href: Route }[] = [
+  { label: 'BEST LOCATION', href: '/location' as Route },
+  { label: 'MORTGAGE', href: '/mortgage' as Route },
+  { label: '3D VISUALISATION', href: '/visualisation' as Route },
 ]
 
-const rightLinks = [
-  { label: 'DOUBLE SAVINGS', href: '/savings' },
-  { label: 'HAPPY OWNERS', href: '/owners' },
-  { label: 'INNOVATIONS', href: '/innovations' },
+const rightLinks: { label: string; href: Route }[] = [
+  { label: 'DOUBLE SAVINGS', href: '/savings' as Route },
+  { label: 'HAPPY OWNERS', href: '/owners' as Route },
+  { label: 'INNOVATIONS', href: '/innovations' as Route },
 ]
+
+const menuLinks: { label: string; href: Route }[] = [...leftLinks, ...rightLinks]
+
 
 export default function Header(): JSX.Element {
+  const [open, setOpen] = useState(false)
   return (
     <header className="w-full">
-      {/* Top announcement bar */}
       <div className="w-full text-center border-b border-[#E7E7E7] text-[#131313] text-[14px] md:text-[15px] xl:text-[20px] px-[63px] h-[55px] md:h-[42px] xl:h-[62px] leading-[22px] flex items-center justify-center">
         EXCLUSIVE HOMES NOW AVAILABLE FOR PRE-SALE
       </div>
 
-      {/* Mobile header */}
       <div className="flex items-center justify-between border-b border-gray-200 px-4 md:px-6 h-[94px] md:h-[88px] xl:hidden">
         <button
+         onClick={() => setOpen(true)}
           aria-label="Open menu"
           className="inline-flex h-[14px] md:h-[18.29px] w-[24px] md:w-[32px] flex-col justify-between"
         >
@@ -51,19 +57,19 @@ export default function Header(): JSX.Element {
             <ul className="flex items-center gap-[50px] 2xl:gap-[80px]">
               {leftLinks.map(({ label, href }) => (
                 <li key={label}>
-                  <a
+                  <Link
                     href={href}
                     className="text-[18px] 2xl:text-[24px] leading-[13px] 2xl:leading-[20px] font-medium uppercase"
                   >
                     {label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
           </nav>
 
           {/* Center logo block */}
-          <div className="flex items-center justify-center h-full w-[212.93px] 2xl:w-[278px] mx-[77.54px_63.54px] 2xl:[81px_61px]">
+          <Link href="/" className="flex items-center justify-center h-full w-[212.93px] 2xl:w-[278px] mx-[77.54px_63.54px] 2xl:[81px_61px]">
             <div className="flex h-full w-full items-center justify-center bg-black border border-[#E7E7E7] p-6">
               <Image
                 src="/images/logo.svg"
@@ -73,25 +79,51 @@ export default function Header(): JSX.Element {
                 priority
               />
             </div>
-          </div>
+          </Link>
 
           {/* Right nav */}
           <nav className="flex-1 flex justify-end">
             <ul className="flex items-center gap-[50px] 2xl:gap-[80px]">
               {rightLinks.map(({ label, href }) => (
                 <li key={label}>
-                  <a
+                  <Link
                     href={href}
                     className="text-[18px] 2xl:text-[24px] leading-[13px] 2xl:leading-[20px] font-medium uppercase"
                   >
                     {label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
           </nav>
         </div>
       </div>
+
+
+       {open && (
+        <div className="fixed inset-0 z-50 bg-white/70 backdrop-blur-xl flex flex-col items-center justify-center gap-8 text-[#131313] uppercase text-[22px] font-medium transition-all duration-300">
+          {/* Кнопка закриття */}
+          <button
+            onClick={() => setOpen(false)}
+            aria-label="Close menu"
+            className="absolute top-6 right-6 text-[#131313]"
+          >
+            ✕
+          </button>
+
+          {/* Лінки */}
+          {menuLinks.map(({ label, href }) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setOpen(false)}
+              className="tracking-[0.05em] hover:opacity-70 transition-opacity text-[16px] md:text-[14px] xl:text-[20px] 2xl:text-[24px] leading-[23px] font-medium uppercase"
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+      )}
     </header>
   )
 }

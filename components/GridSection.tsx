@@ -1,26 +1,61 @@
 import Image from 'next/image'
+import Link from 'next/link';
 import type { JSX } from 'react'
 
 
+type Item = { title?: string; image?: { url: string; alt?: string } | null }
 
-export default function GridSection(): JSX.Element {
+type Props = {
+    gridSection?: {
+        item1?: Item
+        item2?: Item
+        item3?: Item
+        item4?: Item
+        item5?: Item
+        item6?: Item
+        item7?: Item
+    }
+}
+
+export default function GridSection({ gridSection }: Props) {
+    //   if (!gridSection) return null
+  const items = [
+    'http://localhost:3000' + gridSection?.item1?.image?.url ||"/images/grid/1.png",
+    'http://localhost:3000' + gridSection?.item2?.image?.url ||"/images/grid/2.png",
+    'http://localhost:3000' + gridSection?.item3?.image?.url ||"/images/grid/3.png",
+    'http://localhost:3000' + gridSection?.item4?.image?.url ||"/images/grid/4.png",
+    'http://localhost:3000' + gridSection?.item5?.image?.url ||"/images/grid/5.png",
+    'http://localhost:3000' + gridSection?.item6?.image?.url ||"/images/grid/6.jpg",
+    'http://localhost:3000' + gridSection?.item7?.image?.url ||"/images/grid/7.jpg",
+  ]
+  const itemTitles = [
+    gridSection?.item1?.title || "BEST LOCATION",
+    gridSection?.item2?.title || "BEST LOCATION",
+    gridSection?.item3?.title || "Mortgage Programs",
+    gridSection?.item4?.title || "3D visualisatioN",
+    gridSection?.item5?.title || "double savings",
+    gridSection?.item6?.title || "happy owners",
+    gridSection?.item7?.title || "innovations",
+  ]
     return (
-        <section className='w-full 2xl:max-w-[1920px] xl:max-w-[1440px] lg:max-w-[1024px] mx-auto 2xl:pt-[15px] 2xl:pb-[120px] xl:pb-[85px] xl:pt-[10px] md:pt-[5px] pt-[32px] md:pb-[55px] pb-[55px] grid gap-[5px] xl:gap-[10px] 2xl:gap-[15px]'>
+        <section className='w-full 2xl:max-w-[1920px] mx-auto 2xl:pt-[15px] 2xl:pb-[120px] xl:pb-[85px] xl:pt-[10px] md:pt-[5px] pt-[32px] md:pb-[55px] pb-[55px] grid gap-[5px] xl:gap-[10px] 2xl:gap-[15px]'>
             <section className='w-full 2xl:h-[692px] xl:h-[480px] lg:h-[410px] md:h-[360px] h-[312px] relative'>
+                <Link href="/dream">
                 <Image
-                    src="/images/grid/1.png"
+                    src={items[0]}
                     alt="GA Home Design"
                     priority
                     fill
                     className='object-cover'
                 />
+                </Link>
             </section>
             <section className='flex-col md:flex-row w-full 2xl:h-[692px] xl:h-[480px] lg:h-[410px] md:h-[360px] flex 2xl:gap-[15px] xl:gap-[10px] gap-[5px]'>
                 <section className='w-full h-[351px] md:h-auto md:w-1/2 flex flex-col xl:gap-[10px] gap-[5px] '>
                     {/* Wrapper для першої картинки */}
-                    <div className='relative h-1/2'>
+                    <Link href="/location"  className='relative h-1/2'>
                         <Image
-                            src="/images/grid/2.png"
+                            src={items[1]}
                             alt="GA Home Design"
                             priority
                             fill
@@ -33,15 +68,15 @@ export default function GridSection(): JSX.Element {
                         {/* Текст по центру */}
                         <div className="absolute inset-0 flex items-center justify-center">
                             <p className="uppercase text-white text-[24px] md:text-[26px] lg:text-[30px] xl:text-[42px] 2xl:text-[48px]">
-                               BEST LOCATION
+                                {itemTitles[1]}
                             </p>
                         </div>
-                    </div>
+                    </Link>
 
                     {/* Wrapper для другої картинки */}
-                    <div className='relative h-1/2'>
+                    <Link href="/mortgage" className='relative h-1/2'>
                         <Image
-                            src="/images/grid/3.png"
+                            src={items[2]}
                             alt="GA Home Design"
                             priority
                             fill
@@ -53,16 +88,16 @@ export default function GridSection(): JSX.Element {
                         {/* Текст по центру */}
                         <div className="absolute inset-0 flex items-center justify-center">
                             <p className="uppercase text-white text-[24px] md:text-[26px] lg:text-[30px] xl:text-[42px] 2xl:text-[48px]">
-                                Mortgage Programs
+                                {itemTitles[2]}
                             </p>
                         </div>
-                    </div>
+                    </Link>
                 </section>
 
                 {/* Wrapper для третьої картинки */}
-                <div className='relative w-full md:w-1/2 h-[173px] md:h-auto'>
+                <Link href="/visualisation" className='relative w-full md:w-1/2 h-[173px] md:h-auto'>
                     <Image
-                        src="/images/grid/4.png"
+                        src={items[3]}
                         alt="GA Home Design"
                         priority
                         fill
@@ -74,14 +109,14 @@ export default function GridSection(): JSX.Element {
                     {/* Текст по центру */}
                     <div className="absolute inset-0 flex items-center justify-center">
                         <p className="uppercase text-white text-[24px] md:text-[26px] lg:text-[30px] xl:text-[42px] 2xl:text-[48px]">
-                            3D visualisatioN
+                            {itemTitles[3]}
                         </p>
                     </div>
-                </div>
+                </Link>
             </section>
-            <section className='w-full 2xl:h-[341px] xl:h-[235px] lg:h-[202.5px] md:h-[177.5px] h-[173px] relative'>
+            <Link href="/savings" className='w-full 2xl:h-[341px] xl:h-[235px] lg:h-[202.5px] md:h-[177.5px] h-[173px] relative'>
                 <Image
-                    src="/images/grid/5.png"
+                    src={items[4]}
                     alt="GA Home Design"
                     priority
                     fill
@@ -93,15 +128,15 @@ export default function GridSection(): JSX.Element {
                 {/* Текст по центру */}
                 <div className="absolute inset-0 flex items-center justify-center">
                     <p className="uppercase text-white text-[24px] md:text-[26px] lg:text-[30px] xl:text-[42px] 2xl:text-[48px]">
-                        double savings
+                        {itemTitles[4]}
                     </p>
                 </div>
-            </section>
+            </Link>
 
             <section className='w-full 2xl:h-[341px] xl:h-[235px] lg:h-[202.5px] md:h-[177.5px] flex flex-col md:flex-row 2xl:gap-[15px] xl:gap-[10px] gap-[5px]'>
-                <section className='relative w-full md:w-1/2 h-[173px] md:h-auto'>
+                <Link href="/owners" className='relative w-full md:w-1/2 h-[173px] md:h-auto'>
                     <Image
-                        src="/images/grid/6.jpg"
+                        src={items[5]}
                         alt="GA Home Design"
                         priority
                         fill
@@ -113,15 +148,15 @@ export default function GridSection(): JSX.Element {
                     {/* Текст по центру */}
                     <div className="absolute inset-0 flex items-center justify-center">
                         <p className="uppercase text-white text-[24px] md:text-[26px] lg:text-[30px] xl:text-[42px] 2xl:text-[48px]">
-                            happy owners
+                            {itemTitles[5]}
                         </p>
                     </div>
-                </section>
+                </Link>
 
                 {/* Wrapper для третьої картинки */}
-                <div className='relative w-full md:w-1/2 h-[173px] md:h-auto'>
+                <Link href="/innovations" className='relative w-full md:w-1/2 h-[173px] md:h-auto'>
                     <Image
-                        src="/images/grid/7.jpg"
+                        src={items[6]}
                         alt="GA Home Design"
                         priority
                         fill
@@ -133,10 +168,10 @@ export default function GridSection(): JSX.Element {
                     {/* Текст по центру */}
                     <div className="absolute inset-0 flex items-center justify-center">
                         <p className="uppercase text-white text-[24px] md:text-[26px] lg:text-[30px] xl:text-[42px] 2xl:text-[48px]">
-                            innovations
+                            {itemTitles[6]}
                         </p>
                     </div>
-                </div>
+                </Link>
             </section>
 
 

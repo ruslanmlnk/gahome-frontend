@@ -45,7 +45,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         <BlocksRenderer content={Array.isArray(page.content) ? page.content : []} />
       </main>
        {page?.file_download?.file ? (
-        <FIleDownload fileUrl={'http://admin.homegudzdesign.com'+page?.file_download.file?.url} text={page?.file_download.text || ''}/>
+        <FIleDownload fileUrl={'https://admin.homegudzdesign.com'+page?.file_download.file?.url} text={page?.file_download.text || ''}/>
       ) : ''}
 
      {page?.videos && page.videos.length > 0 && (
@@ -53,8 +53,8 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         className='2xl:max-w-[1920px] mx-auto mt-[42px] md:mt-[19px] lg:mt-[15px] xl:mt-[18px] 2xl:mt-[53px] 2xl:pb-[120px] xl:pb-[85px] md:pb-[55px] pb-[22px]'
           items={page.videos
             .map((v: any) => ({
-              poster: "http://admin.homegudzdesign.com" + (v?.poster?.url ?? ""),
-              href:`http://admin.homegudzdesign.com${v.video_file.url}`,
+              poster: "https://admin.homegudzdesign.com" + (v?.poster?.url ?? ""),
+              href:`https://admin.homegudzdesign.com${v.video_file.url}`,
               title: v?.title ?? undefined,
             }))
             .filter((x) => x.poster && x.href)}
@@ -63,7 +63,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       
       {page?.hero_image ? (<section className='w-full relative h-[173px] md:h-[360px] lg:h-[410px] xl:h-[480px] 2xl:h-[692px] mb-[23px]  md:mb-[45px] lg:mb-[55px]  mt-[32px] xl:mt-[47px] xl:mb-[85px] 2xl:mb-[120px] 2xl:mt-[62px] max-w-[1920px] mx-auto'>
         <Image
-          src={'http://admin.homegudzdesign.com/' + page?.hero_image?.url || ''}
+          src={'https://admin.homegudzdesign.com/' + page?.hero_image?.url || ''}
           alt="GA Home Design"
           priority
           fill

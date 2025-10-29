@@ -2,7 +2,7 @@
 import { Route } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, type JSX } from 'react'
+import { useEffect, useState, type JSX } from 'react'
 
 const leftLinks: { label: string; href: Route }[] = [
   { label: 'BEST LOCATION', href: '/location' as Route },
@@ -21,6 +21,43 @@ const menuLinks: { label: string; href: Route }[] = [...leftLinks, ...rightLinks
 
 export default function Header(): JSX.Element {
   const [open, setOpen] = useState(false)
+  
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    if (open) {
+      const scrollY = window.scrollY || window.pageYOffset
+      document.body.style.position = 'fixed'
+      document.body.style.top = `-${scrollY}px`
+      document.body.style.left = '0'
+      document.body.style.right = '0'
+      document.body.style.width = '100%'
+    } else {
+      const top = document.body.style.top
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.left = ''
+      document.body.style.right = ''
+      document.body.style.width = ''
+      if (top) {
+        const y = -parseInt(top, 10) || 0
+        window.scrollTo(0, y)
+      }
+    }
+    return () => {
+      // Cleanup in case the component unmounts while locked
+      document.body.style.position = ''
+      const top = document.body.style.top
+      document.body.style.top = ''
+      document.body.style.left = ''
+      document.body.style.right = ''
+      document.body.style.width = ''
+      if (top) {
+        const y = -parseInt(top, 10) || 0
+        window.scrollTo(0, y)
+      }
+    }
+  }, [open])
   return (
     <header className="w-full">
       <div className="w-full text-center border-b border-[#E7E7E7] text-[#131313] text-[14px] md:text-[15px] xl:text-[20px] px-[63px] h-[55px] md:h-[42px] xl:h-[62px] leading-[22px] flex items-center justify-center">

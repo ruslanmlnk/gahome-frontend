@@ -54,7 +54,7 @@ export async function generateMetadata() {
 
 export default async function Page() {
   const { Home } = await sdk.GetHome().catch(() => ({ Home: null }))
-
+  console.log(Home);
   const gridSection = mapGridSection(Home?.gridSection)
 
   return (

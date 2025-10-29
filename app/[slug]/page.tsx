@@ -21,8 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const res = await sdk.GetPageBySlug({ slug })
-  const page = res?.Pages?.docs?.[0]
-  console.log(page);
+  const page = res?.Pages?.docs?.[0];
   if (!page) return null
 
 

@@ -7552,6 +7552,9 @@ export const GetPageBySlugDocument = gql`
         ... on ReadMore {
           label
         }
+        ... on Disclaimer {
+          text
+        }
       }
     }
   }

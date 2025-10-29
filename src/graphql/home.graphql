@@ -62,6 +62,9 @@ query GetPageBySlug($slug: String!) {
         ... on ReadMore {
           label
         }
+        ... on Disclaimer {
+          text
+        }
       }
     }
   }

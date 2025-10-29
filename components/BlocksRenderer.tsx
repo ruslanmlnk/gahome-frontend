@@ -59,7 +59,7 @@ export default function BlocksRenderer({ content }: { content: AnyBlock[] }) {
   const hasReadMore = idx !== -1
   const after = idx === -1 ? [] : content.slice(idx + 1)
   const disclaimerBlocks = useMemo(() => content.filter(isDisclaimer), [content])
-
+console.log("contentfwefewwe", content)
   return (
     <div className={`${defaultStyle} flex flex-col gap-[9px] md:gap-[14px] lg:gap-[27px] xl:gap-[20px] 2xl:gap-[19px]`}>
       {/* ДО кнопки — звичайний контент */}

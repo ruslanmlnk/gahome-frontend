@@ -18,6 +18,9 @@ const isParagraph = (b: AnyBlock) =>
 const isReadMore = (b: AnyBlock) =>
   ['readmore', 'readmoreblock'].includes(getT(b)) || b?.type === 'ReadMore'
 
+const isDisclaimer = (b: AnyBlock) =>
+  ['disclaimer', 'disclaimerblock'].includes(getT(b)) || getT(b) === 'disclaimer'
+
 function TitleView({ block }: { block: AnyBlock }) {
   return (
     <h2 className="font-medium text-[20px] md:text-[22px] lg:text-[26px] xl:text-[36px] md:leading-[38px] lg:leading-[40px] xl:leading-[55px] 2xl:leading-[70.5px] uppercase text-[#131313] text-center whitespace-pre-line">
@@ -36,6 +39,18 @@ function ParagraphView({ block }: { block: AnyBlock }) {
   )
 }
 
+function DisclaimerView({ block }: { block: AnyBlock }) {
+  const text = String(block?.text ?? '').trim()
+  if (!text) return null
+  return (
+    <section className="px-4 md:px-6 xl:px-[36px] 2xl:px-12 mt-[37px] text-center text-white md:max-w-[768px] lg:max-w-[1024px] xl:max-w-[1440px] 2xl:max-w-[1920px] mx-auto">
+      <div className='bg-[#131313] text-[14px] md:text-[16px] lg:text-[18px] xl:text-[20px] 2xl:text-[26px] p-6 lg:py-12 2xl:px-[157px] lg:px-[48px] leading-[165%] lg:roundex-0 xl:rounded-[20px] 2xl:rounded-[0px]'>
+        <span className="font-medium">Disclaimer: </span>{text}
+      </div>
+    </section>
+  )
+}
+
 export default function BlocksRenderer({ content }: { content: AnyBlock[] }) {
   const idx = useMemo(() => content.findIndex(isReadMore), [content])
   const [open, setOpen] = useState(false)
@@ -43,6 +58,7 @@ export default function BlocksRenderer({ content }: { content: AnyBlock[] }) {
   const before = idx === -1 ? content : content.slice(0, idx)
   const hasReadMore = idx !== -1
   const after = idx === -1 ? [] : content.slice(idx + 1)
+  const disclaimerBlocks = useMemo(() => content.filter(isDisclaimer), [content])
 
   return (
     <div className={`${defaultStyle} flex flex-col gap-[9px] md:gap-[14px] lg:gap-[27px] xl:gap-[20px] 2xl:gap-[19px]`}>
@@ -76,11 +92,9 @@ export default function BlocksRenderer({ content }: { content: AnyBlock[] }) {
                 return null
               })}
             </div>
-            {/* <section className="px-4 md:px-6 xl:px-[36px] 2xl:px-12 mt-[37px] text-center text-white md:max-w-[768px] lg:max-w-[1024px] xl:max-w-[1440px] 2xl:max-w-[1920px] mx-auto">
-              <div className='bg-[#131313] text-[14px] md:text-[16px] lg:text-[18px] xl:text-[20px] 2xl:text-[26px] p-6 lg:py-12 2xl:px-[157px] lg:px-[48px] leading-[165%] lg:roundex-0 xl:rounded-[20px] 2xl:rounded-[0px]'>
-                <span className="font-medium">Disclaimer: </span>Program availability and requirements depend on your profile, property type, and lender policies. Switching between programs may require additional approvals or updated documentation. Our team manages this process end-to-end to keep you secure and informed.
-              </div>
-            </section> */}
+            {disclaimerBlocks[0] ? (
+              <DisclaimerView block={disclaimerBlocks[0]} />
+            ) : null}
           </motion.div>
         )}
       </AnimatePresence>

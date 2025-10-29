@@ -86,13 +86,15 @@ export default function Header(): JSX.Element {
         </button>
 
         <div className="w-[128px] h-[62px]">
-          <Image
-            src="/images/logomob.svg"
-            alt="GA Home Design"
-            width={140}
-            height={50}
-            priority
-          />
+          <Link href="/" aria-label="Go to homepage" className="inline-block">
+            <Image
+              src="/images/logo.png"
+              alt="GA Home Design"
+              width={140}
+              height={50}
+              priority
+            />
+          </Link>
         </div>
       </div>
 

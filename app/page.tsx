@@ -45,12 +45,45 @@ const mapGridSection = (src: any /* GraphQL Home.gridSection */) => {
 export async function generateMetadata() {
   try {
     const { Home } = await sdk.GetHome()
+
+    const title = Home?.meta?.metaTitle ?? 'Home'
+    const description = Home?.meta?.metaDescription ?? ''
+
+    // Pick the first available image from gridSection, fallback to public image
+    const gs = Home?.gridSection as any
+    const firstImageUrl =
+      gs?.item1?.image?.url ||
+      gs?.item2?.image?.url ||
+      gs?.item3?.image?.url ||
+      gs?.item4?.image?.url ||
+      gs?.item5?.image?.url ||
+      gs?.item6?.image?.url ||
+      gs?.item7?.image?.url ||
+      '/images/grid/1.png'
+
     return {
-      title: Home?.meta?.metaTitle ?? 'Home',
-      description: Home?.meta?.metaDescription ?? '',
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        images: [
+          {
+            url: firstImageUrl,
+          },
+        ],
+      },
     }
   } catch {
-    return { title: 'Home', description: '' }
+    return {
+      title: 'Home',
+      description: '',
+      openGraph: {
+        title: 'Home',
+        description: '',
+        images: [{ url: '/images/grid/1.png' }],
+      },
+    }
   }
 }
 

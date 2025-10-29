@@ -12,9 +12,22 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const res = await sdk.GetPageBySlug({ slug })
   const page = res?.Pages?.docs?.[0]
+  const title = page?.meta?.metaTitle ?? ''
+  const description = page?.meta?.metaDescription ?? ''
+  const ogImage = page?.hero_image?.url || '/images/grid/1.png'
+
   return {
-    title: page?.meta?.metaTitle ?? '',
-    description: page?.meta?.metaDescription ?? '',
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [
+        {
+          url: ogImage,
+        },
+      ],
+    },
   }
 }
 

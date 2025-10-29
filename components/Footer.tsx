@@ -67,10 +67,10 @@ export default function Footer(): JSX.Element {
       <div className="mx-auto w-full max-w-[1920px] md:p-6 lg:pb-9 xl:p-9 2xl:p-12 py-9 px-4">
         <div className="flex flex-col md:flex-row justify-between">
           <div className="mb-12 md:mb-0">
-            <Image src="/images/logo.svg" alt="GA Home Design" width={206} height={100} className='xl:w-[206px] lg:w-[140px] lg:h-[68px] md:w-[123.7px] md:h-[60px] w-[140px] h-[68px]'/>
+            <Image src="/images/logo.svg" alt="GA Home Design" width={206} height={100} className='xl:w-[206px] xl:h-[100px] lg:w-[140px] lg:h-[68px] md:w-[123.7px] md:h-[60px] w-[140px] h-[68px]'/>
           </div>
           <nav className="justify-self-end w-full md:max-w-[600px] lg:max-w-[562px] xl:max-w-[734px] 2xl:max-w-[839px]">
-            <ul className="flex flex-col md:flex-row flex-wrap justify-end md:gap-x-[42px] md:gap-y-[15px] lg:gap-x-[68px] lg:gap-y-[21px] xl:gap-y-12 gap-x-[100px]  gap-[22px] text-left md:text-right">
+            <ul className="flex flex-col md:flex-row flex-wrap justify-end md:gap-x-[42px] md:gap-y-[15px] lg:gap-x-[68px] lg:gap-y-[21px] xl:gap-y-12 xl:gap-x-[100px]  gap-[22px] text-left md:text-right">
               {navLinks.map(({ label, href }) => (
                 <li
                   key={label}

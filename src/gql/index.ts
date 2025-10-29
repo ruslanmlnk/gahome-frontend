@@ -33,6 +33,14 @@ export type Access = {
   users: Maybe<UsersAccess>;
 };
 
+export type Disclaimer = {
+  __typename?: 'Disclaimer';
+  blockName: Maybe<Scalars['String']['output']>;
+  blockType: Maybe<Scalars['String']['output']>;
+  id: Maybe<Scalars['String']['output']>;
+  text: Scalars['String']['output'];
+};
+
 export type Home = {
   __typename?: 'Home';
   createdAt: Maybe<Scalars['DateTime']['output']>;
@@ -3531,7 +3539,7 @@ export type Page = {
   videos: Maybe<Array<Page_Videos>>;
 };
 
-export type Page_Content = Paragraph | ReadMore | Title;
+export type Page_Content = Disclaimer | Paragraph | ReadMore | Title;
 
 export type Page_File_Download = {
   __typename?: 'Page_File_download';
@@ -7431,7 +7439,7 @@ export type GetPageBySlugQueryVariables = Exact<{
 }>;
 
 
-export type GetPageBySlugQuery = { __typename?: 'Query', Pages: { __typename?: 'Pages', docs: Array<{ __typename?: 'Page', id: number, slug: string, main_title: string | null, hero_image: { __typename?: 'Media', url: string | null } | null, videos: Array<{ __typename?: 'Page_Videos', video_file: { __typename?: 'Media', url: string | null } | null, poster: { __typename?: 'Media', url: string | null, width: number | null, height: number | null, alt: string | null } | null }> | null, gridcont: Array<{ __typename?: 'Page_Gridcont', title: string | null, description: string | null }> | null, file_download: { __typename?: 'Page_File_download', text: string | null, file: { __typename?: 'Media', url: string | null } | null } | null, meta: { __typename?: 'Page_Meta', metaTitle: string | null, metaDescription: string | null } | null, content: Array<{ __typename: 'Paragraph', paragraph: string | null, strong: boolean | null } | { __typename: 'ReadMore', label: string | null } | { __typename: 'Title', title: string }> | null }> } | null };
+export type GetPageBySlugQuery = { __typename?: 'Query', Pages: { __typename?: 'Pages', docs: Array<{ __typename?: 'Page', id: number, slug: string, main_title: string | null, hero_image: { __typename?: 'Media', url: string | null } | null, videos: Array<{ __typename?: 'Page_Videos', video_file: { __typename?: 'Media', url: string | null } | null, poster: { __typename?: 'Media', url: string | null, width: number | null, height: number | null, alt: string | null } | null }> | null, gridcont: Array<{ __typename?: 'Page_Gridcont', title: string | null, description: string | null }> | null, file_download: { __typename?: 'Page_File_download', text: string | null, file: { __typename?: 'Media', url: string | null } | null } | null, meta: { __typename?: 'Page_Meta', metaTitle: string | null, metaDescription: string | null } | null, content: Array<{ __typename: 'Disclaimer', text: string } | { __typename: 'Paragraph', paragraph: string | null, strong: boolean | null } | { __typename: 'ReadMore', label: string | null } | { __typename: 'Title', title: string }> | null }> } | null };
 
 export type CreateLeadMutationVariables = Exact<{
   fullName: Scalars['String']['input'];

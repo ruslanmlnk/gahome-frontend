@@ -4,11 +4,11 @@ import type { Route } from 'next'
 import type { JSX } from 'react'
 
 const navLinks: { label: string; href: Route }[] = [
-  { label: 'BEST LOCATION', href: '/best-location' as Route },
+  { label: 'BEST LOCATION', href: '/location' as Route },
   { label: 'MORTGAGE', href: '/mortgage' as Route },
-  { label: '3D VISUALISATION', href: '/3d-visualisation' as Route },
-  { label: 'DOUBLE SAVINGS', href: '/double-savings' as Route },
-  { label: 'HAPPY OWNERS', href: '/happy-owners' as Route },
+  { label: '3D VISUALISATION', href: '/visualisation' as Route },
+  { label: 'DOUBLE SAVINGS', href: '/savings' as Route },
+  { label: 'HAPPY OWNERS', href: '/owners' as Route },
   { label: 'INNOVATIONS', href: '/innovations' as Route },
 ]
 

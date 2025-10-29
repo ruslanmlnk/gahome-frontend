@@ -32,6 +32,15 @@ export default function ContactForm({
       {/* Right form */}
       <div className='w-full md:w-1/2 border border-[#D9D9D9] p-6 xl:p-8 bg-white'>
         <form className='flex flex-col gap-[24px] lg:gap-[28px] xl:gap-[32px] 2xl:gap-[33.377px]' noValidate={false} action={submitLead}>
+          {/* Honeypot field to block bots (must stay empty) */}
+          <input
+            type="text"
+            name="website"
+            tabIndex={-1}
+            aria-hidden="true"
+            autoComplete="off"
+            className="hidden"
+          />
           <div>
             <label htmlFor='fullName' className='block text-[#131313] text-[16px] lg:text-[18px] leading-[11px] xl:text-[20px] 2xl:text-[24px] font-medium mb-4 lg:leading-[13px] xl:leading-[14px] 2xl:leading-[17px]'>
               Full Name

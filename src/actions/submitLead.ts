@@ -3,6 +3,11 @@
 import nodemailer from 'nodemailer'
 import { graphqlClient } from '@/src/lib/graphqlClient'
 import { getSdk } from '@/src/gql'
+import { headers } from 'next/headers'
+
+// Basic in-memory rate limiter by IP (per process)
+const lastByIP = new Map<string, number>()
+const RATE_WINDOW_MS = 60_000 // 1 minute
 
 function requireEnv(name: string): string {
   const v = process.env[name]
@@ -15,8 +20,24 @@ export async function submitLead(formData: FormData) {
   const email = String(formData.get('email') ?? '').trim()
   const phone = String(formData.get('phone') ?? '').trim()
   const message = String(formData.get('message') ?? '').trim()
+  const honey = String(formData.get('website') ?? '').trim()
+
+  // Honeypot: if filled, silently drop
+  if (honey) return
 
   if (!fullName) return
+
+  // Throttle by cookie and IP
+  try {
+    const hs = await headers()
+    const ip = (hs.get('x-forwarded-for') || hs.get('x-real-ip') || '').split(',')[0].trim() || 'unknown'
+    const now = Date.now()
+    const lastIpTs = lastByIP.get(ip) ?? 0
+    if (now - lastIpTs < RATE_WINDOW_MS) {
+      return
+    }
+    lastByIP.set(ip, now)
+  } catch {}
 
   // Persist lead via backend SDK (kept as requested)
   const sdk = getSdk(graphqlClient)

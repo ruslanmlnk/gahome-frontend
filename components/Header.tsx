@@ -29,13 +29,23 @@ export default function Header(): JSX.Element {
 
       <div className="flex items-center justify-between border-b border-gray-200 px-4 md:px-6 h-[94px] md:h-[88px] xl:hidden">
         <button
-         onClick={() => setOpen(true)}
-          aria-label="Open menu"
-          className="inline-flex h-[14px] md:h-[18.29px] w-[24px] md:w-[32px] flex-col justify-between"
+          onClick={() => setOpen(v => !v)}
+          aria-label={open ? 'Close menu' : 'Open menu'}
+          aria-expanded={open}
+          className="relative inline-flex items-center justify-center w-[24px] md:w-[32px] h-[24px] md:h-[32px]"
         >
-          <span className="h-[2px] w-full bg-[#131313]"></span>
-          <span className="h-[2px] w-full bg-[#131313]"></span>
-          <span className="h-[2px] w-full bg-[#131313]"></span>
+          {open ? (
+            <>
+              <span className="absolute block h-[2px] w-full bg-[#131313] rotate-45"></span>
+              <span className="absolute block h-[2px] w-full bg-[#131313] -rotate-45"></span>
+            </>
+          ) : (
+            <span className="inline-flex h-[14px] md:h-[18.29px] w-[24px] md:w-[32px] flex-col justify-between">
+              <span className="h-[2px] w-full bg-[#131313]"></span>
+              <span className="h-[2px] w-full bg-[#131313]"></span>
+              <span className="h-[2px] w-full bg-[#131313]"></span>
+            </span>
+          )}
         </button>
 
         <div className="w-[128px] h-[62px]">
@@ -101,17 +111,7 @@ export default function Header(): JSX.Element {
 
 
        {open && (
-        <div className="fixed inset-0 z-50 bg-white/70 backdrop-blur-xl flex flex-col items-center justify-center gap-8 text-[#131313] uppercase text-[22px] font-medium transition-all duration-300">
-          {/* Кнопка закриття */}
-          <button
-            onClick={() => setOpen(false)}
-            aria-label="Close menu"
-            className="absolute top-6 right-6 text-[#131313]"
-          >
-            ✕
-          </button>
-
-          {/* Лінки */}
+        <div className="fixed left-0 right-0 bottom-0 top-[149px] md:top-[130px] xl:hidden z-40 bg-white/70 backdrop-blur-xl flex flex-col items-center pt-10 gap-8 text-[#131313] uppercase text-[22px] font-medium transition-all duration-300">
           {menuLinks.map(({ label, href }) => (
             <Link
               key={href}

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 
 type VideoItem = { poster: string; href?: string; title?: string };
 type VideoGridProps = { items: VideoItem[]; className?: string };
@@ -39,11 +40,13 @@ export default function VideoGrid({ items, className = "" }: VideoGridProps) {
                             )
                         ) : (
                             <>
-                                <img
+                                <Image
                                     src={v.poster}
                                     alt={v.title || "Video poster"}
+                                    fill
                                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                                     loading="lazy"
+                                    sizes="100vw"
                                 />
 
                                 <button

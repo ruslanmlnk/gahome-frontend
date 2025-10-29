@@ -1,21 +1,34 @@
 import Image from 'next/image'
+import Link from 'next/link'
+import type { Route } from 'next'
 import type { JSX } from 'react'
 
-const navItems = [
-  'BEST LOCATION',
-  'MORTGAGE',
-  '3D VISUALISATION',
-  'DOUBLE SAVINGS',
-  'HAPPY OWNERS',
-  'INNOVATIONS',
+const navLinks: { label: string; href: Route }[] = [
+  { label: 'BEST LOCATION', href: '/best-location' as Route },
+  { label: 'MORTGAGE', href: '/mortgage' as Route },
+  { label: '3D VISUALISATION', href: '/3d-visualisation' as Route },
+  { label: 'DOUBLE SAVINGS', href: '/double-savings' as Route },
+  { label: 'HAPPY OWNERS', href: '/happy-owners' as Route },
+  { label: 'INNOVATIONS', href: '/innovations' as Route },
 ]
 
 function SocialIcon({ type }: { type: 'facebook' | 'instagram' | 'x' }): JSX.Element {
+  const hrefMap: Record<'facebook' | 'instagram' | 'x', string> = {
+    instagram:
+      'https://www.instagram.com/plumb_supplyigsh=Zndma2kzM244NGxt&utm_source=qr',
+    facebook:
+      'https://www.facebook.com/share/1A5EPBLcMr/?mibextid=wwXIfr',
+    x: '#',
+  }
+  const className =
+    'inline-flex h-8 w-8 md:h-9 md:w-9 2xl:h-12 2xl:w-12 items-center justify-center rounded-full bg-white text-[#131313]'
   return (
     <a
-      href="#"
+      href={hrefMap[type]}
       aria-label={type}
-      className="inline-flex h-8 w-8 md:h-9 md:w-9 2xl:h-12 2xl:w-12 items-center justify-center rounded-full bg-white text-[#131313]"
+      className={className}
+      target="_blank"
+      rel="noopener noreferrer"
     >
       {type === 'facebook' && (
         <svg width="11" height="20" viewBox="0 0 11 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -58,12 +71,14 @@ export default function Footer(): JSX.Element {
           </div>
           <nav className="justify-self-end w-full md:max-w-[600px] lg:max-w-[562px] xl:max-w-[734px] 2xl:max-w-[839px]">
             <ul className="flex flex-col md:flex-row flex-wrap justify-end md:gap-x-[42px] md:gap-y-[15px] lg:gap-x-[68px] lg:gap-y-[21px] xl:gap-y-12 gap-x-[100px]  gap-[22px] text-left md:text-right">
-              {navItems.map((label) => (
+              {navLinks.map(({ label, href }) => (
                 <li
                   key={label}
                   className="text-[16px] md:text-[14px] xl:text-[20px] 2xl:text-[24px] leading-[23px] font-medium uppercase md:w-[142px] xl:w-[178px] 2xl:w-[213px] text-left md:text-right"
                 >
-                  {label}
+                  <Link href={href} className="block">
+                    {label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -79,10 +94,8 @@ export default function Footer(): JSX.Element {
         <div className="flex items-center gap-4">
           <SocialIcon type="facebook" />
           <SocialIcon type="instagram" />
-          <SocialIcon type="x" />
         </div>
       </div>
     </footer>
   )
 }
-

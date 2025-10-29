@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic' 
+
 import { graphqlClient } from '@/src/lib/graphqlClient'
 import { getSdk } from '@/src/gql'
 import GridSection from '@/components/GridSection'

@@ -1,15 +1,24 @@
 import type { MetadataRoute } from 'next'
+import { headers } from 'next/headers'
 import { graphqlClient } from '@/src/lib/graphqlClient'
 
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
+
+async function getBaseUrl() {
+  const h = await headers()
+  const forwardedHost = h.get('x-forwarded-host')
+  const host = forwardedHost || h.get('host') || 'localhost:3000'
+  const protoHeader = h.get('x-forwarded-proto')
+  const proto = protoHeader || (host.startsWith('localhost') ? 'http' : 'https')
+  return `${proto}://${host}`.replace(/\/$/, '')
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = process.env.NEXT_PUBLIC_SITE_URL
-  const baseUrl = base ? base.replace(/\/$/, '') : ''
+  const baseUrl = await getBaseUrl()
 
   const items: MetadataRoute.Sitemap = [
     {
-      url: baseUrl ? `${baseUrl}/` : '/',
+      url: `${baseUrl}/`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 1,
@@ -32,7 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if (!d?.slug) continue
       const path = d.slug.startsWith('/') ? d.slug : `/${d.slug}`
       items.push({
-        url: baseUrl ? `${baseUrl}${path}` : path,
+        url: `${baseUrl}${path}`,
         lastModified: d.updatedAt ? new Date(d.updatedAt) : new Date(),
         changeFrequency: 'weekly',
         priority: 0.7,

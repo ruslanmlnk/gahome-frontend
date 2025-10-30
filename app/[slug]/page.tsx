@@ -6,12 +6,14 @@ import Image from 'next/image'
 import GridContent from '@/components/GridContent'
 import FIleDownload from '@/components/FileDownload'
 import VideoGrid from '@/components/VideoGrid'
+import { notFound } from 'next/navigation'
 const sdk = getSdk(graphqlClient)
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const res = await sdk.GetPageBySlug({ slug })
   const page = res?.Pages?.docs?.[0]
+  if (!page) return {}
   const title = page?.meta?.metaTitle ?? ''
   const description = page?.meta?.metaDescription ?? ''
   const ogImage = page?.hero_image?.url || '/images/grid/1.png'
@@ -35,7 +37,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const { slug } = await params
   const res = await sdk.GetPageBySlug({ slug })
   const page = res?.Pages?.docs?.[0];
-  if (!page) return null
+  if (!page) return notFound()
 
 
 

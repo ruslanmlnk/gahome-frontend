@@ -7,9 +7,8 @@ async function getBaseUrl() {
   const h = await headers()
   const forwardedHost = h.get('x-forwarded-host')
   const host = forwardedHost || h.get('host') || 'localhost:3000'
-  const protoHeader = h.get('x-forwarded-proto')
-  const proto = protoHeader || (host.startsWith('localhost') ? 'http' : 'https')
-  return `${proto}://${host}`.replace(/\/$/, '')
+  // Force HTTPS regardless of incoming proto
+  return `https://${host}`.replace(/\/$/, '')
 }
 
 export default async function robots(): Promise<MetadataRoute.Robots> {

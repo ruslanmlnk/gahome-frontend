@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     typedRoutes: true,
   },
   images: {
+    domains: ['admin.homegudzdesign.com'],
     remotePatterns: [
       {
         protocol: 'https',

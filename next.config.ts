@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     typedRoutes: true,
   },
   images: {
+    unoptimized: true,
     domains: ['admin.homegudzdesign.com'],
     remotePatterns: [
       {

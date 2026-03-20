@@ -5,13 +5,14 @@ query GetHome {
       metaDescription
     }
     gridSection {
-      item1 { title image { url alt } }
-      item2 { title image { url alt } }
-      item3 { title image { url alt } }
-      item4 { title image { url alt } }
-      item5 { title image { url alt } }
-      item6 { title image { url alt } }
-      item7 { title image { url alt } }
+      item1 { title image { url alt mimeType videoPoster { url alt } } }
+      item2 { title image { url alt mimeType videoPoster { url alt } } }
+      item3 { title image { url alt mimeType videoPoster { url alt } } }
+      item4 { title image { url alt mimeType videoPoster { url alt } } }
+      item5 { title image { url alt mimeType videoPoster { url alt } } }
+      item6 { title image { url alt mimeType videoPoster { url alt } } }
+      item7 { title image { url alt mimeType videoPoster { url alt } } }
+      item8 { title href image { url alt mimeType videoPoster { url alt } } }
     }
   }
 }

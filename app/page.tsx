@@ -1,36 +1,106 @@
-export const dynamic = 'force-dynamic' 
+export const dynamic = 'force-dynamic'
 
-import { graphqlClient } from '@/src/lib/graphqlClient'
-import { getSdk } from '@/src/gql'
 import GridSection from '@/components/GridSection'
+import { graphqlClient } from '@/src/lib/graphqlClient'
 
-const sdk = getSdk(graphqlClient)
+const GET_HOME_QUERY = /* GraphQL */ `
+  query GetHomePage {
+    Home {
+      meta {
+        metaTitle
+        metaDescription
+      }
+      gridSection {
+        item1 { title image { url alt mimeType videoPoster { url alt } } }
+        item2 { title image { url alt mimeType videoPoster { url alt } } }
+        item3 { title image { url alt mimeType videoPoster { url alt } } }
+        item4 { title image { url alt mimeType videoPoster { url alt } } }
+        item5 { title image { url alt mimeType videoPoster { url alt } } }
+        item6 { title image { url alt mimeType videoPoster { url alt } } }
+        item7 { title image { url alt mimeType videoPoster { url alt } } }
+        item8 { title href image { url alt mimeType videoPoster { url alt } } }
+      }
+    }
+  }
+`
 
-// helper-и для мапінгу GraphQL -> проп GridSection
+type PosterAsset = {
+  url: string | null
+  alt: string | null
+} | null
+
+type MediaAsset = {
+  url: string | null
+  alt: string | null
+  mimeType: string | null
+  videoPoster: PosterAsset
+} | null
+
 type GQLItem = {
   title: string | null
-  image: { url: string | null; alt: string | null } | null
+  href?: string | null
+  image: MediaAsset
 } | null | undefined
+
+type HomeQueryResult = {
+  Home: {
+    meta: {
+      metaTitle: string | null
+      metaDescription: string | null
+    } | null
+    gridSection: {
+      item1: GQLItem
+      item2: GQLItem
+      item3: GQLItem
+      item4: GQLItem
+      item5: GQLItem
+      item6: GQLItem
+      item7: GQLItem
+      item8: GQLItem
+    } | null
+  } | null
+}
+
+type HomeData = NonNullable<HomeQueryResult['Home']>
+
+const fetchHome = async (): Promise<HomeQueryResult['Home'] | null> => {
+  const data = await graphqlClient
+    .request<HomeQueryResult>(GET_HOME_QUERY)
+    .catch(() => ({ Home: null }))
+
+  return data.Home ?? null
+}
 
 const mapItem = (src: GQLItem) => {
   if (!src) return undefined
+
   const title = src.title ?? undefined
   const url = src.image?.url ?? undefined
-  if (url) {
-    return {
-      title,
-      image: {
-        url,
-        alt: src.image?.alt ?? '', // alt очікується як string
-      },
-    }
+
+  if (!url) {
+    return { title }
   }
-  // без картинки
-  return { title }
+
+  return {
+    title,
+    image: {
+      url,
+      alt: src.image?.alt ?? '',
+      mimeType: src.image?.mimeType ?? null,
+      videoPoster: src.image?.videoPoster?.url
+        ? {
+            url: src.image.videoPoster.url,
+            alt: src.image.videoPoster.alt ?? '',
+          }
+        : null,
+    },
+    href: src.href ?? undefined,
+  }
 }
 
-const mapGridSection = (src: any /* GraphQL Home.gridSection */) => {
+const mapGridSection = (src: HomeData['gridSection']) => {
   if (!src) return undefined
+
   return {
     item1: mapItem(src.item1),
     item2: mapItem(src.item2),
@@ -39,37 +109,50 @@ const mapGridSection = (src: any /* GraphQL Home.gridSection */) => {
     item5: mapItem(src.item5),
     item6: mapItem(src.item6),
     item7: mapItem(src.item7),
+    item8: mapItem(src.item8),
   }
+}
+
+const pickPreviewImage = (home: HomeQueryResult['Home'] | null) => {
+  const gridSection = home?.gridSection
+  const assets = [
+    gridSection?.item1?.image,
+    gridSection?.item2?.image,
+    gridSection?.item3?.image,
+    gridSection?.item4?.image,
+    gridSection?.item5?.image,
+    gridSection?.item6?.image,
+    gridSection?.item7?.image,
+    gridSection?.item8?.image,
+  ]
+
+  for (const asset of assets) {
+    if (!asset?.url) continue
+
+    if (asset.mimeType?.startsWith('video/')) {
+      if (asset.videoPoster?.url) return asset.videoPoster.url
+      continue
+    }
+
+    return asset.url
+  }
+
+  return '/images/grid/1.png'
 }
 
 export async function generateMetadata() {
   try {
-    const { Home } = await sdk.GetHome()
-
-    const title = Home?.meta?.metaTitle ?? 'Home'
-    const description = Home?.meta?.metaDescription ?? ''
-
-    // Pick the first available image from gridSection, fallback to public image
-    const gs = Home?.gridSection as any
-    const firstImageUrl =
-      gs?.item1?.image?.url ||
-      gs?.item2?.image?.url ||
-      gs?.item3?.image?.url ||
-      gs?.item4?.image?.url ||
-      gs?.item5?.image?.url ||
-      gs?.item6?.image?.url ||
-      gs?.item7?.image?.url ||
-      '/images/grid/1.png'
+    const home = await fetchHome()
 
     return {
-      title,
-      description,
+      title: home?.meta?.metaTitle ?? 'Home',
+      description: home?.meta?.metaDescription ?? '',
       openGraph: {
-        title,
-        description,
+        title: home?.meta?.metaTitle ?? 'Home',
+        description: home?.meta?.metaDescription ?? '',
         images: [
           {
-            url: firstImageUrl,
+            url: pickPreviewImage(home),
           },
         ],
       },
@@ -88,13 +171,8 @@ export async function generateMetadata() {
 }
 
 export default async function Page() {
-  const { Home } = await sdk.GetHome().catch(() => ({ Home: null }))
-  console.log(Home);
-  const gridSection = mapGridSection(Home?.gridSection)
+  const home = await fetchHome()
+  const gridSection = mapGridSection(home?.gridSection ?? null)
 
-  return (
-    <>
-      <GridSection gridSection={gridSection} />
-    </>
-  )
+  return <GridSection gridSection={gridSection} />
 }

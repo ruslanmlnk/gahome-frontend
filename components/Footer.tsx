@@ -15,7 +15,7 @@ const navLinks: { label: string; href: Route }[] = [
 function SocialIcon({ type }: { type: 'facebook' | 'instagram' | 'x' }): JSX.Element {
   const hrefMap: Record<'facebook' | 'instagram' | 'x', string> = {
     instagram:
-      'https://www.instagram.com/plumb_supplyigsh=Zndma2kzM244NGxt&utm_source=qr',
+      'https://www.instagram.com/plumb_supply?igsh=Zndma2kzM244NGxt&utm_source=qr',
     facebook:
       'https://www.facebook.com/share/1A5EPBLcMr/?mibextid=wwXIfr',
     x: '#',

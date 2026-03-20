@@ -7,8 +7,9 @@ const nextConfig: NextConfig = {
   },
   serverExternalPackages: ['nodemailer'],
   images: {
-    unoptimized: true,
     domains: ['admin.homegudzdesign.com'],
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 2678400,
     remotePatterns: [
       {
         protocol: 'https',

@@ -21,6 +21,20 @@ const isReadMore = (b: AnyBlock) =>
 const isDisclaimer = (b: AnyBlock) =>
   ['disclaimer', 'disclaimerblock'].includes(getT(b)) || getT(b) === 'disclaimer'
 
+const getParagraphHTML = (value: unknown): { __html: string } => {
+  const input = String(value ?? '')
+
+  const sanitized = input
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, '')
+    .replace(/\son\w+=(["']).*?\1/gi, '')
+    .replace(/\son\w+=([^\s>]+)/gi, '')
+    .replace(/\s(href|src)=(["'])\s*javascript:[\s\S]*?\2/gi, '')
+    .replace(/\n/g, '<br />')
+
+  return { __html: sanitized }
+}
+
 function TitleView({ block }: { block: AnyBlock }) {
   return (
     <h2 className="font-medium text-[20px] md:text-[22px] lg:text-[26px] xl:text-[36px] md:leading-[38px] lg:leading-[40px] xl:leading-[55px] 2xl:leading-[70.5px] uppercase text-[#131313] text-center whitespace-pre-line">
@@ -33,9 +47,10 @@ function ParagraphView({ block }: { block: AnyBlock }) {
   const weightClass = block?.strong ? 'md:text-[20px] font-medium' : 'font-normal'
   // теж компенсація для потоку, щоб не було перекриття
   return (
-    <p className={`text-[14px] md:text-[16px] lg:text-[18px] xl:text-[20px] 2xl:text-[26px] ${weightClass} leading-[23px] md:leading-[25px] xl:leading-[34px] 2xl:leading-[39px] text-[#878787] text-center whitespace-pre-line tracking-[-0.03px] `}>
-      {block?.paragraph}
-    </p>
+    <p
+      className={`text-[14px] md:text-[16px] lg:text-[18px] xl:text-[20px] 2xl:text-[26px] ${weightClass} leading-[23px] md:leading-[25px] xl:leading-[34px] 2xl:leading-[39px] text-[#878787] text-center tracking-[-0.03px] [&_a]:underline [&_a]:underline-offset-4`}
+      dangerouslySetInnerHTML={getParagraphHTML(block?.paragraph)}
+    />
   )
 }
 
@@ -59,7 +74,6 @@ export default function BlocksRenderer({ content }: { content: AnyBlock[] }) {
   const hasReadMore = idx !== -1
   const after = idx === -1 ? [] : content.slice(idx + 1)
   const disclaimerBlocks = useMemo(() => content.filter(isDisclaimer), [content])
-console.log("contentfwefewwe", content)
   return (
     <div className={`${defaultStyle} flex flex-col gap-[9px] md:gap-[14px] lg:gap-[27px] xl:gap-[20px] 2xl:gap-[19px]`}>
       {/* ДО кнопки — звичайний контент */}

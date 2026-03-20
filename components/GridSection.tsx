@@ -2,13 +2,15 @@ import Image from 'next/image'
 import type { Route } from 'next'
 import Link from 'next/link'
 import type { JSX } from 'react'
+import { pickMediaVariant, type MediaSizeName, type MediaWithSizes } from '@/src/lib/pickMediaVariant'
+import { shouldUnoptimizeImage } from '@/src/lib/shouldUnoptimizeImage'
 
 type PosterAsset = {
   url: string
   alt?: string | null
-}
+} & MediaWithSizes
 
-type MediaAsset = {
+type MediaAsset = MediaWithSizes & {
   url: string
   alt?: string | null
   mimeType?: string | null
@@ -50,17 +52,21 @@ function GridAsset({
   title,
   className,
   sizes,
+  preferredSizes,
   priority = false,
 }: {
   asset: MediaAsset
   title: string
   className: string
   sizes: string
+  preferredSizes: MediaSizeName[]
   priority?: boolean
 }): JSX.Element {
   const isVideo = asset.mimeType?.startsWith('video/')
 
   if (isVideo) {
+    const posterVariant = pickMediaVariant(asset.videoPoster, preferredSizes)
+
     return (
       <video
         autoPlay
@@ -68,7 +74,7 @@ function GridAsset({
         loop
         playsInline
         preload="metadata"
-        poster={asset.videoPoster?.url ?? undefined}
+        poster={posterVariant?.url ?? undefined}
         className={className}
       >
         <source src={asset.url} type={asset.mimeType ?? undefined} />
@@ -76,11 +82,18 @@ function GridAsset({
     )
   }
 
+  const variant = pickMediaVariant(asset, preferredSizes)
+
+  if (!variant) {
+    return <></>
+  }
+
   return (
     <Image
-      src={asset.url}
-      alt={asset.alt || title || 'GA Home Design'}
+      src={variant.url}
+      alt={variant.alt || title || 'GA Home Design'}
       priority={priority}
+      unoptimized={shouldUnoptimizeImage(variant.url)}
       fill
       sizes={sizes}
       className={className}
@@ -122,6 +135,7 @@ export default function GridSection({ gridSection }: Props) {
             title={itemTitles[0]}
             priority
             sizes="100vw"
+            preferredSizes={['desktop', 'tablet', 'card']}
             className="object-cover w-full h-full"
           />
         </Link>
@@ -133,6 +147,7 @@ export default function GridSection({ gridSection }: Props) {
               asset={items[1]}
               title={itemTitles[1]}
               sizes="(max-width: 767px) 100vw, 50vw"
+              preferredSizes={['tablet', 'card', 'desktop']}
               className="object-cover 2xl:object-[center_-170px] object-[center_center] w-full h-full"
             />
             <div className="absolute inset-0 bg-[rgba(19,19,19,0.1)]" />
@@ -148,6 +163,7 @@ export default function GridSection({ gridSection }: Props) {
               asset={items[2]}
               title={itemTitles[2]}
               sizes="(max-width: 767px) 100vw, 50vw"
+              preferredSizes={['tablet', 'card', 'desktop']}
               className="object-cover 2xl:object-[center_-170px] object-[center_center] w-full h-full"
             />
             <div className="absolute inset-0 bg-[rgba(19,19,19,0.1)]" />
@@ -164,6 +180,7 @@ export default function GridSection({ gridSection }: Props) {
             asset={items[3]}
             title={itemTitles[3]}
             sizes="(max-width: 767px) 100vw, 50vw"
+            preferredSizes={['tablet', 'card', 'desktop']}
             className="object-cover w-full h-full"
           />
           <div className="absolute inset-0 bg-[rgba(19,19,19,0.1)]" />
@@ -179,6 +196,7 @@ export default function GridSection({ gridSection }: Props) {
           asset={items[4]}
           title={itemTitles[4]}
           sizes="100vw"
+          preferredSizes={['desktop', 'tablet', 'card']}
           className="object-cover w-full h-full"
         />
         <div className="absolute inset-0 bg-[rgba(19,19,19,0.1)]" />
@@ -195,6 +213,7 @@ export default function GridSection({ gridSection }: Props) {
             asset={items[5]}
             title={itemTitles[5]}
             sizes="(max-width: 767px) 100vw, 50vw"
+            preferredSizes={['tablet', 'card', 'desktop']}
             className="object-cover object-[center_-33px] w-full h-full"
           />
           <div className="absolute inset-0 bg-[rgba(19,19,19,0.1)]" />
@@ -210,6 +229,7 @@ export default function GridSection({ gridSection }: Props) {
             asset={items[6]}
             title={itemTitles[6]}
             sizes="(max-width: 767px) 100vw, 50vw"
+            preferredSizes={['tablet', 'card', 'desktop']}
             className="object-cover w-full h-full"
           />
           <div className="absolute inset-0 bg-[rgba(19,19,19,0.1)]" />
@@ -229,6 +249,7 @@ export default function GridSection({ gridSection }: Props) {
             asset={items[7]}
             title={itemTitles[7]}
             sizes="100vw"
+            preferredSizes={['desktop', 'tablet', 'card']}
             className="object-cover w-full h-full"
           />
           <div className="absolute inset-0 bg-[rgba(19,19,19,0.1)]" />
@@ -244,6 +265,7 @@ export default function GridSection({ gridSection }: Props) {
             asset={items[7]}
             title={itemTitles[7]}
             sizes="100vw"
+            preferredSizes={['desktop', 'tablet', 'card']}
             className="object-cover w-full h-full"
           />
           <div className="absolute inset-0 bg-[rgba(19,19,19,0.1)]" />

@@ -1,15 +1,12 @@
 'use client'
 
 import Image from 'next/image'
+import { pickMediaVariant, type MediaWithSizes } from '@/src/lib/pickMediaVariant'
 import { resolveMediaUrl } from '@/src/lib/resolveMediaUrl'
+import { shouldUnoptimizeImage } from '@/src/lib/shouldUnoptimizeImage'
 import { useEffect, useMemo, useRef, useState, type JSX } from 'react'
 
-type RenderImage = {
-  url?: string | null
-  alt?: string | null
-  width?: number | null
-  height?: number | null
-}
+type RenderImage = MediaWithSizes
 
 type RenderGalleryItem = {
   image?: RenderImage | null
@@ -34,6 +31,7 @@ function normalizeImage(image: RenderImage | null | undefined): RenderImage | nu
     alt: image?.alt ?? 'Render image',
     width: image?.width ?? 1600,
     height: image?.height ?? 1000,
+    sizes: image?.sizes ?? null,
   }
 }
 
@@ -243,15 +241,24 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
                             : 'border-[#E7E7E7] opacity-80 hover:opacity-100'
                         }`}
                       >
-                        <div className="relative aspect-[16/10] md:aspect-[16/9]">
-                          <Image
-                            src={slide.url || ''}
-                            alt={slide.alt || 'Render image'}
-                            fill
-                            sizes="(max-width: 767px) 84vw, (max-width: 1279px) 58vw, 38vw"
-                            className="object-contain transition-transform duration-500 ease-out group-hover:scale-[1.02]"
-                          />
-                        </div>
+                        {(() => {
+                          const slideVariant = pickMediaVariant(slide, ['card', 'tablet', 'desktop'])
+
+                          if (!slideVariant) return null
+
+                          return (
+                            <div className="relative aspect-[16/10] md:aspect-[16/9]">
+                              <Image
+                                src={slideVariant.url}
+                                alt={slideVariant.alt || 'Render image'}
+                                unoptimized={shouldUnoptimizeImage(slideVariant.url)}
+                                fill
+                                sizes="(max-width: 767px) 84vw, (max-width: 1279px) 58vw, 38vw"
+                                className="object-contain transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+                              />
+                            </div>
+                          )
+                        })()}
 
                         <div className="absolute bottom-4 right-4 rounded-full bg-black/70 px-3 py-1 text-[12px] text-white md:text-[14px]">
                           {singleRender.slides.length} views
@@ -316,15 +323,24 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
                             : 'border-[#E7E7E7] opacity-80 hover:opacity-100'
                         }`}
                       >
-                        <div className="relative aspect-[16/10] md:aspect-[16/9]">
-                          <Image
-                            src={render.preview.url || ''}
-                            alt={render.preview.alt || 'Render preview'}
-                            fill
-                            sizes="(max-width: 767px) 84vw, (max-width: 1279px) 58vw, 38vw"
-                            className="object-contain transition-transform duration-500 ease-out group-hover:scale-[1.02]"
-                          />
-                        </div>
+                        {(() => {
+                          const previewVariant = pickMediaVariant(render.preview, ['card', 'tablet', 'desktop'])
+
+                          if (!previewVariant) return null
+
+                          return (
+                            <div className="relative aspect-[16/10] md:aspect-[16/9]">
+                              <Image
+                                src={previewVariant.url}
+                                alt={previewVariant.alt || 'Render preview'}
+                                unoptimized={shouldUnoptimizeImage(previewVariant.url)}
+                                fill
+                                sizes="(max-width: 767px) 84vw, (max-width: 1279px) 58vw, 38vw"
+                                className="object-contain transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+                              />
+                            </div>
+                          )
+                        })()}
 
                         {render.slides.length > 1 ? (
                           <div className="absolute bottom-4 right-4 rounded-full bg-black/70 px-3 py-1 text-[12px] text-white md:text-[14px]">
@@ -389,13 +405,22 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
 
           <div className="mx-auto flex h-full w-full max-w-[1600px] flex-col justify-center gap-4">
             <div className="relative flex-1 overflow-hidden rounded-[20px] bg-black/20">
-              <Image
-                src={openedSlide.url || ''}
-                alt={openedSlide.alt || 'Render gallery image'}
-                fill
-                sizes="100vw"
-                className="object-contain"
-              />
+              {(() => {
+                const openedVariant = pickMediaVariant(openedSlide, ['desktop', 'tablet', 'card'])
+
+                if (!openedVariant) return null
+
+                return (
+                  <Image
+                    src={openedVariant.url}
+                    alt={openedVariant.alt || 'Render gallery image'}
+                    unoptimized={shouldUnoptimizeImage(openedVariant.url)}
+                    fill
+                    sizes="100vw"
+                    className="object-contain"
+                  />
+                )
+              })()}
             </div>
 
             <div className="flex items-center justify-between text-white">
@@ -418,13 +443,22 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
                         : 'border-white/20 opacity-70 hover:opacity-100'
                     }`}
                   >
-                    <Image
-                      src={slide.url || ''}
-                      alt={slide.alt || 'Render gallery thumbnail'}
-                      width={140}
-                      height={96}
-                      className="h-[72px] w-[108px] object-cover md:h-[84px] md:w-[126px]"
-                    />
+                    {(() => {
+                      const thumbnailVariant = pickMediaVariant(slide, ['thumbnail', 'card', 'tablet'])
+
+                      if (!thumbnailVariant) return null
+
+                      return (
+                        <Image
+                          src={thumbnailVariant.url}
+                          alt={thumbnailVariant.alt || 'Render gallery thumbnail'}
+                          unoptimized={shouldUnoptimizeImage(thumbnailVariant.url)}
+                          width={thumbnailVariant.width || 140}
+                          height={thumbnailVariant.height || 96}
+                          className="h-[72px] w-[108px] object-cover md:h-[84px] md:w-[126px]"
+                        />
+                      )
+                    })()}
                   </button>
                 ))}
               </div>

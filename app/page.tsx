@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import GridSection from '@/components/GridSection'
 import { graphqlClient } from '@/src/lib/graphqlClient'
+import { pickMediaVariant, type MediaSizeVariant, type MediaWithSizes } from '@/src/lib/pickMediaVariant'
 import { resolveMediaUrl } from '@/src/lib/resolveMediaUrl'
 
 const GET_HOME_QUERY = /* GraphQL */ `
@@ -12,28 +13,41 @@ const GET_HOME_QUERY = /* GraphQL */ `
         metaDescription
       }
       gridSection {
-        item1 { title image { url alt mimeType videoPoster { url alt } } }
-        item2 { title image { url alt mimeType videoPoster { url alt } } }
-        item3 { title image { url alt mimeType videoPoster { url alt } } }
-        item4 { title image { url alt mimeType videoPoster { url alt } } }
-        item5 { title image { url alt mimeType videoPoster { url alt } } }
-        item6 { title image { url alt mimeType videoPoster { url alt } } }
-        item7 { title image { url alt mimeType videoPoster { url alt } } }
-        item8 { title href image { url alt mimeType videoPoster { url alt } } }
+        item1 { title image { url alt mimeType width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } videoPoster { url alt width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } } } }
+        item2 { title image { url alt mimeType width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } videoPoster { url alt width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } } } }
+        item3 { title image { url alt mimeType width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } videoPoster { url alt width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } } } }
+        item4 { title image { url alt mimeType width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } videoPoster { url alt width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } } } }
+        item5 { title image { url alt mimeType width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } videoPoster { url alt width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } } } }
+        item6 { title image { url alt mimeType width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } videoPoster { url alt width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } } } }
+        item7 { title image { url alt mimeType width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } videoPoster { url alt width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } } } }
+        item8 { title href image { url alt mimeType width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } videoPoster { url alt width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } } } }
       }
     }
   }
 `
 
+type SizeMap = {
+  thumbnail?: MediaSizeVariant | null
+  card?: MediaSizeVariant | null
+  tablet?: MediaSizeVariant | null
+  desktop?: MediaSizeVariant | null
+} | null
+
 type PosterAsset = {
   url: string | null
   alt: string | null
+  width?: number | null
+  height?: number | null
+  sizes?: SizeMap
 } | null
 
 type MediaAsset = {
   url: string | null
   alt: string | null
   mimeType: string | null
+  width?: number | null
+  height?: number | null
+  sizes?: SizeMap
   videoPoster: PosterAsset
 } | null
 
@@ -89,10 +103,16 @@ const mapItem = (src: GQLItem) => {
       url,
       alt: src.image?.alt ?? '',
       mimeType: src.image?.mimeType ?? null,
+      width: src.image?.width ?? null,
+      height: src.image?.height ?? null,
+      sizes: src.image?.sizes ?? null,
       videoPoster: resolveMediaUrl(videoPoster?.url)
         ? {
             url: resolveMediaUrl(videoPoster?.url),
             alt: videoPoster?.alt ?? '',
+            width: videoPoster?.width ?? null,
+            height: videoPoster?.height ?? null,
+            sizes: videoPoster?.sizes ?? null,
           }
         : null,
     },
@@ -132,11 +152,13 @@ const pickPreviewImage = (home: HomeQueryResult['Home'] | null) => {
     if (!asset?.url) continue
 
     if (asset.mimeType?.startsWith('video/')) {
-      if (asset.videoPoster?.url) return resolveMediaUrl(asset.videoPoster.url)
+      const poster = pickMediaVariant(asset.videoPoster as MediaWithSizes, ['desktop', 'tablet', 'card'])
+      if (poster?.url) return poster.url
       continue
     }
 
-    return resolveMediaUrl(asset.url)
+    const variant = pickMediaVariant(asset as MediaWithSizes, ['desktop', 'tablet', 'card'])
+    if (variant?.url) return variant.url
   }
 
   return '/images/grid/1.png'

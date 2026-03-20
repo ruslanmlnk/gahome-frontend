@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { resolveMediaUrl } from "@/src/lib/resolveMediaUrl";
+import { shouldUnoptimizeImage } from "@/src/lib/shouldUnoptimizeImage";
 
 type VideoItem = { poster: string; href?: string; title?: string };
 type VideoGridProps = { items: VideoItem[]; className?: string };
@@ -45,6 +46,7 @@ export default function VideoGrid({ items, className = "" }: VideoGridProps) {
                                 <Image
                                     src={posterUrl}
                                     alt={v.title || "Video poster"}
+                                    unoptimized={shouldUnoptimizeImage(posterUrl)}
                                     fill
                                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                                     loading="lazy"

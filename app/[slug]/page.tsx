@@ -3,7 +3,9 @@ import FIleDownload from '@/components/FileDownload'
 import GridContent from '@/components/GridContent'
 import VideoGrid from '@/components/VideoGrid'
 import { graphqlClient } from '@/src/lib/graphqlClient'
+import { pickMediaVariant, type MediaSizeVariant, type MediaWithSizes } from '@/src/lib/pickMediaVariant'
 import { resolveMediaUrl } from '@/src/lib/resolveMediaUrl'
+import { shouldUnoptimizeImage } from '@/src/lib/shouldUnoptimizeImage'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 
@@ -16,6 +18,14 @@ const GET_PAGE_QUERY = /* GraphQL */ `
         main_title
         hero_image {
           url
+          width
+          height
+          sizes {
+            thumbnail { url width height mimeType }
+            card { url width height mimeType }
+            tablet { url width height mimeType }
+            desktop { url width height mimeType }
+          }
         }
         videos {
           video_file {
@@ -26,6 +36,12 @@ const GET_PAGE_QUERY = /* GraphQL */ `
             width
             height
             alt
+            sizes {
+              thumbnail { url width height mimeType }
+              card { url width height mimeType }
+              tablet { url width height mimeType }
+              desktop { url width height mimeType }
+            }
           }
         }
         gridcont {
@@ -58,6 +74,12 @@ const GET_PAGE_QUERY = /* GraphQL */ `
                 alt
                 width
                 height
+                sizes {
+                  thumbnail { url width height mimeType }
+                  card { url width height mimeType }
+                  tablet { url width height mimeType }
+                  desktop { url width height mimeType }
+                }
               }
             }
           }
@@ -68,6 +90,12 @@ const GET_PAGE_QUERY = /* GraphQL */ `
                 alt
                 width
                 height
+                sizes {
+                  thumbnail { url width height mimeType }
+                  card { url width height mimeType }
+                  tablet { url width height mimeType }
+                  desktop { url width height mimeType }
+                }
               }
               gallery {
                 image {
@@ -75,6 +103,12 @@ const GET_PAGE_QUERY = /* GraphQL */ `
                   alt
                   width
                   height
+                  sizes {
+                    thumbnail { url width height mimeType }
+                    card { url width height mimeType }
+                    tablet { url width height mimeType }
+                    desktop { url width height mimeType }
+                  }
                 }
               }
             }
@@ -99,6 +133,14 @@ type PageQueryResult = {
       main_title: string | null
       hero_image: {
         url: string | null
+        width: number | null
+        height: number | null
+        sizes?: {
+          thumbnail?: MediaSizeVariant | null
+          card?: MediaSizeVariant | null
+          tablet?: MediaSizeVariant | null
+          desktop?: MediaSizeVariant | null
+        } | null
       } | null
       videos:
         | Array<{
@@ -110,6 +152,12 @@ type PageQueryResult = {
               width: number | null
               height: number | null
               alt: string | null
+              sizes?: {
+                thumbnail?: MediaSizeVariant | null
+                card?: MediaSizeVariant | null
+                tablet?: MediaSizeVariant | null
+                desktop?: MediaSizeVariant | null
+              } | null
             } | null
           }>
         | null
@@ -150,7 +198,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const title = page.meta?.metaTitle ?? ''
   const description = page.meta?.metaDescription ?? ''
-  const ogImage = resolveMediaUrl(page.hero_image?.url) || '/images/grid/1.png'
+  const ogImage = pickMediaVariant(page.hero_image as MediaWithSizes, ['desktop', 'tablet', 'card'])?.url || '/images/grid/1.png'
 
   return {
     title,
@@ -212,7 +260,8 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           className="2xl:max-w-[1920px] mx-auto mt-[42px] md:mt-[19px] lg:mt-[15px] xl:mt-[18px] 2xl:mt-[53px] 2xl:pb-[120px] xl:pb-[85px] md:pb-[55px] pb-[22px]"
           items={page.videos
             .map((v) => ({
-              poster: resolveMediaUrl(v?.poster?.url),
+              poster:
+                pickMediaVariant(v?.poster as MediaWithSizes, ['card', 'tablet', 'desktop'])?.url ?? '',
               href: resolveMediaUrl(v?.video_file?.url),
               title: undefined,
             }))
@@ -222,14 +271,23 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
       {page.hero_image ? (
         <section className="w-full relative h-[173px] md:h-[360px] lg:h-[410px] xl:h-[480px] 2xl:h-[692px] mb-[23px]  md:mb-[45px] lg:mb-[55px]  mt-[32px] xl:mt-[47px] xl:mb-[85px] 2xl:mb-[120px] 2xl:mt-[62px] max-w-[1920px] mx-auto">
+          {(() => {
+            const heroVariant = pickMediaVariant(page.hero_image as MediaWithSizes, ['desktop', 'tablet', 'card'])
+
+            if (!heroVariant) return null
+
+            return (
           <Image
-            src={resolveMediaUrl(page.hero_image.url)}
+            src={heroVariant.url}
             alt="GA Home Design"
             priority
+            unoptimized={shouldUnoptimizeImage(heroVariant.url)}
             fill
             sizes="100vw"
             className="object-cover"
           />
+            )
+          })()}
         </section>
       ) : (
         ''

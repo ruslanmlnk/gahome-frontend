@@ -2,7 +2,12 @@
 
 import Image from 'next/image'
 import RendersBlock from '@/components/RendersBlock'
-import { resolveMediaUrl } from '@/src/lib/resolveMediaUrl'
+import {
+  pickMediaVariant,
+  type MediaWithSizes,
+  type PickedMediaVariant,
+} from '@/src/lib/pickMediaVariant'
+import { shouldUnoptimizeImage } from '@/src/lib/shouldUnoptimizeImage'
 import { useEffect, useMemo, useState } from 'react'
 
 type AnyBlock = Record<string, any>
@@ -66,20 +71,12 @@ function ParagraphView({ block }: { block: AnyBlock }) {
 }
 
 function GalleryView({ block }: { block: AnyBlock }) {
-  const items = Array.isArray(block?.items)
+  const items: PickedMediaVariant[] = Array.isArray(block?.items)
     ? block.items
         .map((item: AnyBlock) => {
-          const image = item?.image
-          const url = resolveMediaUrl(image?.url)
-
-          if (!url) return null
-
-          return {
-            ...image,
-            url,
-          }
+          return pickMediaVariant(item?.image as MediaWithSizes, ['card', 'tablet', 'desktop'])
         })
-        .filter((image: AnyBlock | null | undefined) => Boolean(image?.url))
+        .filter((image): image is PickedMediaVariant => Boolean(image?.url))
     : []
 
   if (!items.length) return null
@@ -88,7 +85,7 @@ function GalleryView({ block }: { block: AnyBlock }) {
     <section className="w-full mt-[12px] md:mt-[20px] lg:mt-[24px]">
       <div className="mx-auto w-full max-w-[1920px]">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-[10px] xl:gap-[15px] items-start">
-          {items.map((image: AnyBlock, index: number) => (
+          {items.map((image, index) => (
             <div
               key={`${image.url}-${index}`}
               className="group overflow-hidden bg-[#F5F5F5]"
@@ -96,6 +93,7 @@ function GalleryView({ block }: { block: AnyBlock }) {
               <Image
                 src={image.url}
                 alt={image.alt || 'Gallery image'}
+                unoptimized={shouldUnoptimizeImage(image.url)}
                 width={Number(image.width) || 1600}
                 height={Number(image.height) || 1200}
                 sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 33vw"

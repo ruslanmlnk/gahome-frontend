@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import RendersBlock from '@/components/RendersBlock'
 import { useEffect, useMemo, useState } from 'react'
 
 type AnyBlock = Record<string, any>
@@ -17,7 +18,12 @@ const isParagraph = (b: AnyBlock) =>
   ['paragraph', 'paragraphblock', 'textblock'].includes(getT(b)) || 'paragraph' in (b ?? {})
 
 const isGallery = (b: AnyBlock) =>
-  ['imagegallery', 'gallery', 'galleryblock'].includes(getT(b)) || 'items' in (b ?? {})
+  ['imagegallery', 'gallery', 'galleryblock'].includes(getT(b)) ||
+  (Array.isArray(b?.items) && b.items.every((item: AnyBlock) => 'image' in (item ?? {})))
+
+const isRenders = (b: AnyBlock) =>
+  ['renders', 'rendersblock'].includes(getT(b)) ||
+  (Array.isArray(b?.items) && b.items.some((item: AnyBlock) => 'mainImage' in (item ?? {})))
 
 const isReadMore = (b: AnyBlock) =>
   ['readmore', 'readmoreblock'].includes(getT(b)) || b?.type === 'ReadMore'
@@ -96,6 +102,7 @@ function renderBlock(block: AnyBlock, key: string) {
   if (isTitle(block)) return <TitleView key={key} block={block} />
   if (isParagraph(block)) return <ParagraphView key={key} block={block} />
   if (isGallery(block)) return <GalleryView key={key} block={block} />
+  if (isRenders(block)) return <RendersBlock key={key} items={block?.items} />
   return null
 }
 

@@ -60,6 +60,24 @@ const GET_PAGE_QUERY = /* GraphQL */ `
               }
             }
           }
+          ... on Renders {
+            items {
+              mainImage {
+                url
+                alt
+                width
+                height
+              }
+              gallery {
+                image {
+                  url
+                  alt
+                  width
+                  height
+                }
+              }
+            }
+          }
           ... on ReadMore {
             label
           }

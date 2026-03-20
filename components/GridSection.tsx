@@ -1,21 +1,6 @@
-import Image from 'next/image'
 import type { Route } from 'next'
 import Link from 'next/link'
-import type { JSX } from 'react'
-import { pickMediaVariant, type MediaSizeName, type MediaWithSizes } from '@/src/lib/pickMediaVariant'
-import { shouldUnoptimizeImage } from '@/src/lib/shouldUnoptimizeImage'
-
-type PosterAsset = {
-  url: string
-  alt?: string | null
-} & MediaWithSizes
-
-type MediaAsset = MediaWithSizes & {
-  url: string
-  alt?: string | null
-  mimeType?: string | null
-  videoPoster?: PosterAsset | null
-}
+import HomeGridMedia, { type HomeGridMediaAsset as MediaAsset } from '@/components/HomeGridMedia'
 
 type Item = {
   title?: string
@@ -47,60 +32,6 @@ const defaultAssets: MediaAsset[] = [
   { url: '/images/grid/5.png', alt: 'New block' },
 ]
 
-function GridAsset({
-  asset,
-  title,
-  className,
-  sizes,
-  preferredSizes,
-  priority = false,
-}: {
-  asset: MediaAsset
-  title: string
-  className: string
-  sizes: string
-  preferredSizes: MediaSizeName[]
-  priority?: boolean
-}): JSX.Element {
-  const isVideo = asset.mimeType?.startsWith('video/')
-
-  if (isVideo) {
-    const posterVariant = pickMediaVariant(asset.videoPoster, preferredSizes)
-
-    return (
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="metadata"
-        poster={posterVariant?.url ?? undefined}
-        className={className}
-      >
-        <source src={asset.url} type={asset.mimeType ?? undefined} />
-      </video>
-    )
-  }
-
-  const variant = pickMediaVariant(asset, preferredSizes)
-
-  if (!variant) {
-    return <></>
-  }
-
-  return (
-    <Image
-      src={variant.url}
-      alt={variant.alt || title || 'GA Home Design'}
-      priority={priority}
-      unoptimized={shouldUnoptimizeImage(variant.url)}
-      fill
-      sizes={sizes}
-      className={className}
-    />
-  )
-}
-
 export default function GridSection({ gridSection }: Props) {
   const items = [
     gridSection?.item1?.image ?? defaultAssets[0],
@@ -125,30 +56,31 @@ export default function GridSection({ gridSection }: Props) {
   ]
 
   const item8Href = gridSection?.item8?.href
+  const mediaClassName = 'object-cover object-center w-full h-full'
 
   return (
     <section className="w-full 2xl:max-w-[1920px] mx-auto 2xl:pt-[15px] 2xl:pb-[120px] xl:pb-[85px] xl:pt-[10px] md:pt-[5px] pt-[32px] md:pb-[55px] pb-[55px] grid gap-[5px] xl:gap-[10px] 2xl:gap-[15px]">
       <section className="w-full 2xl:h-[692px] xl:h-[480px] lg:h-[410px] md:h-[360px] h-[312px] relative">
         <Link href="/dream" className="block w-full h-full">
-          <GridAsset
+          <HomeGridMedia
             asset={items[0]}
             title={itemTitles[0]}
             priority
             sizes="100vw"
             preferredSizes={['desktop', 'tablet', 'card']}
-            className="object-cover w-full h-full"
+            className={mediaClassName}
           />
         </Link>
       </section>
       <section className="flex-col md:flex-row w-full 2xl:h-[692px] xl:h-[480px] lg:h-[410px] md:h-[360px] flex 2xl:gap-[15px] xl:gap-[10px] gap-[5px]">
         <section className="w-full h-[351px] md:h-auto md:w-1/2 flex flex-col xl:gap-[10px] gap-[5px] ">
           <Link href="/location" className="relative h-1/2">
-            <GridAsset
+            <HomeGridMedia
               asset={items[1]}
               title={itemTitles[1]}
               sizes="(max-width: 767px) 100vw, 50vw"
               preferredSizes={['tablet', 'card', 'desktop']}
-              className="object-cover 2xl:object-[center_-170px] object-[center_center] w-full h-full"
+              className={mediaClassName}
             />
             <div className="absolute inset-0 bg-[rgba(19,19,19,0.1)]" />
             <div className="absolute inset-0 flex items-center justify-center">
@@ -159,12 +91,12 @@ export default function GridSection({ gridSection }: Props) {
           </Link>
 
           <Link href="/mortgage" className="relative h-1/2">
-            <GridAsset
+            <HomeGridMedia
               asset={items[2]}
               title={itemTitles[2]}
               sizes="(max-width: 767px) 100vw, 50vw"
               preferredSizes={['tablet', 'card', 'desktop']}
-              className="object-cover 2xl:object-[center_-170px] object-[center_center] w-full h-full"
+              className={mediaClassName}
             />
             <div className="absolute inset-0 bg-[rgba(19,19,19,0.1)]" />
             <div className="absolute inset-0 flex items-center justify-center">
@@ -176,12 +108,12 @@ export default function GridSection({ gridSection }: Props) {
         </section>
 
         <Link href="/visualisation" className="relative w-full md:w-1/2 h-[173px] md:h-auto">
-          <GridAsset
+          <HomeGridMedia
             asset={items[3]}
             title={itemTitles[3]}
             sizes="(max-width: 767px) 100vw, 50vw"
             preferredSizes={['tablet', 'card', 'desktop']}
-            className="object-cover w-full h-full"
+            className={mediaClassName}
           />
           <div className="absolute inset-0 bg-[rgba(19,19,19,0.1)]" />
           <div className="absolute inset-0 flex items-center justify-center">
@@ -192,12 +124,12 @@ export default function GridSection({ gridSection }: Props) {
         </Link>
       </section>
       <Link href="/savings" className="w-full 2xl:h-[341px] xl:h-[235px] lg:h-[202.5px] md:h-[177.5px] h-[173px] relative">
-        <GridAsset
+        <HomeGridMedia
           asset={items[4]}
           title={itemTitles[4]}
           sizes="100vw"
           preferredSizes={['desktop', 'tablet', 'card']}
-          className="object-cover w-full h-full"
+          className={mediaClassName}
         />
         <div className="absolute inset-0 bg-[rgba(19,19,19,0.1)]" />
         <div className="absolute inset-0 flex items-center justify-center">
@@ -209,12 +141,12 @@ export default function GridSection({ gridSection }: Props) {
 
       <section className="w-full 2xl:h-[341px] xl:h-[235px] lg:h-[202.5px] md:h-[177.5px] flex flex-col md:flex-row 2xl:gap-[15px] xl:gap-[10px] gap-[5px]">
         <Link href="/owners" className="relative w-full md:w-1/2 h-[173px] md:h-auto">
-          <GridAsset
+          <HomeGridMedia
             asset={items[5]}
             title={itemTitles[5]}
             sizes="(max-width: 767px) 100vw, 50vw"
             preferredSizes={['tablet', 'card', 'desktop']}
-            className="object-cover object-[center_-33px] w-full h-full"
+            className={mediaClassName}
           />
           <div className="absolute inset-0 bg-[rgba(19,19,19,0.1)]" />
           <div className="absolute inset-0 flex items-center justify-center">
@@ -225,12 +157,12 @@ export default function GridSection({ gridSection }: Props) {
         </Link>
 
         <Link href="/innovations" className="relative w-full md:w-1/2 h-[173px] md:h-auto">
-          <GridAsset
+          <HomeGridMedia
             asset={items[6]}
             title={itemTitles[6]}
             sizes="(max-width: 767px) 100vw, 50vw"
             preferredSizes={['tablet', 'card', 'desktop']}
-            className="object-cover w-full h-full"
+            className={mediaClassName}
           />
           <div className="absolute inset-0 bg-[rgba(19,19,19,0.1)]" />
           <div className="absolute inset-0 flex items-center justify-center">
@@ -245,12 +177,12 @@ export default function GridSection({ gridSection }: Props) {
           href={item8Href as Route}
           className="w-full 2xl:h-[341px] xl:h-[235px] lg:h-[202.5px] md:h-[177.5px] h-[173px] relative"
         >
-          <GridAsset
+          <HomeGridMedia
             asset={items[7]}
             title={itemTitles[7]}
             sizes="100vw"
             preferredSizes={['desktop', 'tablet', 'card']}
-            className="object-cover w-full h-full"
+            className={mediaClassName}
           />
           <div className="absolute inset-0 bg-[rgba(19,19,19,0.1)]" />
           <div className="absolute inset-0 flex items-center justify-center">
@@ -261,12 +193,12 @@ export default function GridSection({ gridSection }: Props) {
         </Link>
       ) : (
         <section className="w-full 2xl:h-[341px] xl:h-[235px] lg:h-[202.5px] md:h-[177.5px] h-[173px] relative">
-          <GridAsset
+          <HomeGridMedia
             asset={items[7]}
             title={itemTitles[7]}
             sizes="100vw"
             preferredSizes={['desktop', 'tablet', 'card']}
-            className="object-cover w-full h-full"
+            className={mediaClassName}
           />
           <div className="absolute inset-0 bg-[rgba(19,19,19,0.1)]" />
           <div className="absolute inset-0 flex items-center justify-center">

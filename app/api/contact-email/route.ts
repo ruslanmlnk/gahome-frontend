@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server"
-import nodemailer from "nodemailer"
 
 export const runtime = "nodejs"
 
@@ -35,6 +34,7 @@ export async function POST(req: NextRequest) {
     const pass = requireEnv("SMTP_PASS")
     const to = process.env.CONTACT_TO_EMAIL || process.env.EMAIL_TO || user
 
+    const nodemailer = (await import('nodemailer')).default
     const transporter = nodemailer.createTransport({
       host,
       port,

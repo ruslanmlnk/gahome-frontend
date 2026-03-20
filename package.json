@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
+    "devsafe": "node -e \"require('fs').rmSync('.next', { recursive: true, force: true })\" && next dev -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
     "codegen": "graphql-codegen --config codegen.ts"

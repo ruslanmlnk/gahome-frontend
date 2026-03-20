@@ -101,8 +101,8 @@ export default function GridSection({ gridSection }: Props) {
   ]
 
   const itemTitles = [
-    gridSection?.item1?.title || 'BEST LOCATION',
-    gridSection?.item2?.title || 'BEST LOCATION',
+    gridSection?.item1?.title || 'LOCATION',
+    gridSection?.item2?.title || 'LOCATION',
     gridSection?.item3?.title || 'Mortgage Programs',
     gridSection?.item4?.title || '3D visualisatioN',
     gridSection?.item5?.title || 'double savings',

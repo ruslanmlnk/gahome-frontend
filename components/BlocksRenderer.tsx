@@ -1,9 +1,10 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import Image from 'next/image'
+import { useEffect, useMemo, useState } from 'react'
 
 type AnyBlock = Record<string, any>
+type MotionModule = typeof import('framer-motion')
 
 
 const defaultStyle = "container text-center mx-auto px-[16px] md:px-[86px] lg:px-[107px] xl:px-[123px] 2xl:px-[200px] flex flex-col 2xl:max-w-[1920px]";
@@ -14,6 +15,9 @@ const isTitle = (b: AnyBlock) =>
 
 const isParagraph = (b: AnyBlock) =>
   ['paragraph', 'paragraphblock', 'textblock'].includes(getT(b)) || 'paragraph' in (b ?? {})
+
+const isGallery = (b: AnyBlock) =>
+  ['imagegallery', 'gallery', 'galleryblock'].includes(getT(b)) || 'items' in (b ?? {})
 
 const isReadMore = (b: AnyBlock) =>
   ['readmore', 'readmoreblock'].includes(getT(b)) || b?.type === 'ReadMore'
@@ -54,6 +58,47 @@ function ParagraphView({ block }: { block: AnyBlock }) {
   )
 }
 
+function GalleryView({ block }: { block: AnyBlock }) {
+  const items = Array.isArray(block?.items)
+    ? block.items
+        .map((item: AnyBlock) => item?.image)
+        .filter((image: AnyBlock | null | undefined) => Boolean(image?.url))
+    : []
+
+  if (!items.length) return null
+
+  return (
+    <section className="w-full mt-[12px] md:mt-[20px] lg:mt-[24px]">
+      <div className="mx-auto w-full max-w-[1920px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-[10px] xl:gap-[15px] items-start">
+          {items.map((image: AnyBlock, index: number) => (
+            <div
+              key={`${image.url}-${index}`}
+              className="group overflow-hidden bg-[#F5F5F5]"
+            >
+              <Image
+                src={image.url}
+                alt={image.alt || 'Gallery image'}
+                width={Number(image.width) || 1600}
+                height={Number(image.height) || 1200}
+                sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 33vw"
+                className="h-auto w-full transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function renderBlock(block: AnyBlock, key: string) {
+  if (isTitle(block)) return <TitleView key={key} block={block} />
+  if (isParagraph(block)) return <ParagraphView key={key} block={block} />
+  if (isGallery(block)) return <GalleryView key={key} block={block} />
+  return null
+}
+
 function DisclaimerView({ block }: { block: AnyBlock }) {
   const text = String(block?.text ?? '').trim()
   if (!text) return null
@@ -69,49 +114,78 @@ function DisclaimerView({ block }: { block: AnyBlock }) {
 export default function BlocksRenderer({ content }: { content: AnyBlock[] }) {
   const idx = useMemo(() => content.findIndex(isReadMore), [content])
   const [open, setOpen] = useState(false)
+  const [motionModule, setMotionModule] = useState<MotionModule | null>(null)
 
   const before = idx === -1 ? content : content.slice(0, idx)
   const hasReadMore = idx !== -1
   const after = idx === -1 ? [] : content.slice(idx + 1)
   const disclaimerBlocks = useMemo(() => content.filter(isDisclaimer), [content])
+
+  useEffect(() => {
+    let isMounted = true
+
+    import('framer-motion')
+      .then((module) => {
+        if (isMounted) setMotionModule(module)
+      })
+      .catch(() => {
+        if (isMounted) setMotionModule(null)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  const AnimatePresence = motionModule?.AnimatePresence
+  const MotionDiv = motionModule?.motion?.div
+
+  const readMoreContent = hasReadMore && open && (
+    <div className={`flex flex-col gap-[9px] md:gap-[14px] lg:gap-[27px] xl:gap-[20px] 2xl:gap-[19px] `}>
+      {after.map((block, i) => {
+        return renderBlock(block, `tail-${i}`)
+      })}
+    </div>
+  )
+
   return (
     <div className={`${defaultStyle} flex flex-col gap-[9px] md:gap-[14px] lg:gap-[27px] xl:gap-[20px] 2xl:gap-[19px]`}>
       {/* ДО кнопки — звичайний контент */}
       {/* <section className={defaultStyle}> */}
 
         {before.map((block, i) => {
-          if (isTitle(block)) return <TitleView key={`b-${i}`} block={block} />
-          if (isParagraph(block)) return <ParagraphView key={`b-${i}`} block={block} />
-          return null
+          return renderBlock(block, `b-${i}`)
         })}
 
       {/* </section> */}
-      {/* ПЕРЕД кнопкою — прихований контент з auto-height анімацією */}
-      <AnimatePresence initial={false}>
-        {hasReadMore && open && (
-          <motion.div
-            id="readmore-content"
-            key="rm" // ключ для AnimatePresence
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
-            className="overflow-hidden" // без mt — щільно прилягає
-          >
-            <div className={`flex flex-col gap-[9px] md:gap-[14px] lg:gap-[27px] xl:gap-[20px] 2xl:gap-[19px] `}>
-              {after.map((block, i) => {
-                const key = `tail-${i}`
-                if (isTitle(block)) return <TitleView key={key} block={block} />
-                if (isParagraph(block)) return <ParagraphView key={key} block={block} />
-                return null
-              })}
-            </div>
-            {disclaimerBlocks[0] ? (
-              <DisclaimerView block={disclaimerBlocks[0]} />
-            ) : null}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* ПЕРЕД кнопкою — прихований контент */}
+      {AnimatePresence && MotionDiv ? (
+        <AnimatePresence initial={false}>
+          {hasReadMore && open && (
+            <MotionDiv
+              id="readmore-content"
+              key="rm"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="overflow-hidden"
+            >
+              {readMoreContent}
+              {disclaimerBlocks[0] ? (
+                <DisclaimerView block={disclaimerBlocks[0]} />
+              ) : null}
+            </MotionDiv>
+          )}
+        </AnimatePresence>
+      ) : hasReadMore && open ? (
+        <div id="readmore-content" className="overflow-hidden">
+          {readMoreContent}
+          {disclaimerBlocks[0] ? (
+            <DisclaimerView block={disclaimerBlocks[0]} />
+          ) : null}
+        </div>
+      ) : null}
 
       {/* Кнопка Read more / Read less */}
       {hasReadMore && (

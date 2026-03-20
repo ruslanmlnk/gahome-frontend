@@ -1,6 +1,5 @@
 'use server'
 
-import nodemailer from 'nodemailer'
 import { graphqlClient } from '@/src/lib/graphqlClient'
 import { getSdk } from '@/src/gql'
 import { headers } from 'next/headers'
@@ -50,6 +49,7 @@ export async function submitLead(formData: FormData) {
   const pass = requireEnv('SMTP_PASS')
   const to = process.env.CONTACT_TO_EMAIL || process.env.EMAIL_TO || user
 
+  const nodemailer = (await import('nodemailer')).default
   const transporter = nodemailer.createTransport({
     host,
     port,

@@ -5,14 +5,14 @@ import Link from 'next/link'
 import { useEffect, useState, type JSX } from 'react'
 
 const leftLinks: { label: string; href: Route }[] = [
-  { label: 'BEST LOCATION', href: '/location' as Route },
+  { label: 'LOCATION', href: '/location' as Route },
   { label: 'MORTGAGE', href: '/mortgage' as Route },
   { label: '3D VISUALISATION', href: '/visualisation' as Route },
 ]
 
 const rightLinks: { label: string; href: Route }[] = [
   { label: 'DOUBLE SAVINGS', href: '/savings' as Route },
-  { label: 'HAPPY OWNERS', href: '/owners' as Route },
+  { label: 'OUR CLIENTS', href: '/owners' as Route },
   { label: 'INNOVATIONS', href: '/innovations' as Route },
 ]
 

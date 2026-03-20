@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   experimental: {
     typedRoutes: true,
   },
+  serverExternalPackages: ['nodemailer'],
   images: {
     unoptimized: true,
     domains: ['admin.homegudzdesign.com'],

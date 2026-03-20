@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
+import { resolveMediaUrl } from "@/src/lib/resolveMediaUrl";
 
 type VideoItem = { poster: string; href?: string; title?: string };
 type VideoGridProps = { items: VideoItem[]; className?: string };
@@ -19,6 +20,7 @@ export default function VideoGrid({ items, className = "" }: VideoGridProps) {
             {items.map((v, i) => {
                 const isActive = activeIndex === i;
                 const videoUrl = v.href ?? "";
+                const posterUrl = resolveMediaUrl(v.poster);
                 const embedUrl = isYouTube(videoUrl)
                     ? videoUrl.replace("watch?v=", "embed/")
                     : isVimeo(videoUrl)
@@ -41,7 +43,7 @@ export default function VideoGrid({ items, className = "" }: VideoGridProps) {
                         ) : (
                             <>
                                 <Image
-                                    src={v.poster}
+                                    src={posterUrl}
                                     alt={v.title || "Video poster"}
                                     fill
                                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"

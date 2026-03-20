@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import RendersBlock from '@/components/RendersBlock'
+import { resolveMediaUrl } from '@/src/lib/resolveMediaUrl'
 import { useEffect, useMemo, useState } from 'react'
 
 type AnyBlock = Record<string, any>
@@ -67,7 +68,17 @@ function ParagraphView({ block }: { block: AnyBlock }) {
 function GalleryView({ block }: { block: AnyBlock }) {
   const items = Array.isArray(block?.items)
     ? block.items
-        .map((item: AnyBlock) => item?.image)
+        .map((item: AnyBlock) => {
+          const image = item?.image
+          const url = resolveMediaUrl(image?.url)
+
+          if (!url) return null
+
+          return {
+            ...image,
+            url,
+          }
+        })
         .filter((image: AnyBlock | null | undefined) => Boolean(image?.url))
     : []
 

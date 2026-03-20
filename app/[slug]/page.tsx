@@ -3,6 +3,7 @@ import FIleDownload from '@/components/FileDownload'
 import GridContent from '@/components/GridContent'
 import VideoGrid from '@/components/VideoGrid'
 import { graphqlClient } from '@/src/lib/graphqlClient'
+import { resolveMediaUrl } from '@/src/lib/resolveMediaUrl'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 
@@ -149,7 +150,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const title = page.meta?.metaTitle ?? ''
   const description = page.meta?.metaDescription ?? ''
-  const ogImage = page.hero_image?.url || '/images/grid/1.png'
+  const ogImage = resolveMediaUrl(page.hero_image?.url) || '/images/grid/1.png'
 
   return {
     title,
@@ -199,7 +200,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       </main>
       {page.file_download?.file ? (
         <FIleDownload
-          fileUrl={page.file_download.file?.url}
+          fileUrl={resolveMediaUrl(page.file_download.file?.url)}
           text={page.file_download.text || ''}
         />
       ) : (
@@ -211,8 +212,8 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           className="2xl:max-w-[1920px] mx-auto mt-[42px] md:mt-[19px] lg:mt-[15px] xl:mt-[18px] 2xl:mt-[53px] 2xl:pb-[120px] xl:pb-[85px] md:pb-[55px] pb-[22px]"
           items={page.videos
             .map((v) => ({
-              poster: v?.poster?.url ?? '',
-              href: v?.video_file?.url ?? '',
+              poster: resolveMediaUrl(v?.poster?.url),
+              href: resolveMediaUrl(v?.video_file?.url),
               title: undefined,
             }))
             .filter((x) => x.poster && x.href)}
@@ -222,7 +223,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       {page.hero_image ? (
         <section className="w-full relative h-[173px] md:h-[360px] lg:h-[410px] xl:h-[480px] 2xl:h-[692px] mb-[23px]  md:mb-[45px] lg:mb-[55px]  mt-[32px] xl:mt-[47px] xl:mb-[85px] 2xl:mb-[120px] 2xl:mt-[62px] max-w-[1920px] mx-auto">
           <Image
-            src={page.hero_image.url || ''}
+            src={resolveMediaUrl(page.hero_image.url)}
             alt="GA Home Design"
             priority
             fill

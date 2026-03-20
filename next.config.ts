@@ -7,7 +7,6 @@ const nextConfig = {
   },
   serverExternalPackages: ['nodemailer'],
   images: {
-    dangerouslyAllowLocalIP: true,
     domains: ['admin.homegudzdesign.com'],
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 2678400,
@@ -22,7 +21,7 @@ const nextConfig = {
         port: '3000',
       },
     ],
-  } as NonNullable<NextConfig['images']> & { dangerouslyAllowLocalIP: boolean },
+  } as NonNullable<NextConfig['images']>,
 } satisfies NextConfig
 
 export default nextConfig

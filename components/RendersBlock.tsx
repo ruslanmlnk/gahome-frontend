@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { resolveMediaUrl } from '@/src/lib/resolveMediaUrl'
 import { useEffect, useMemo, useRef, useState, type JSX } from 'react'
 
 type RenderImage = {
@@ -25,13 +26,14 @@ type NormalizedRender = {
 }
 
 function normalizeImage(image: RenderImage | null | undefined): RenderImage | null {
-  if (!image?.url) return null
+  const url = resolveMediaUrl(image?.url)
+  if (!url) return null
 
   return {
-    url: image.url,
-    alt: image.alt ?? 'Render image',
-    width: image.width ?? 1600,
-    height: image.height ?? 1000,
+    url,
+    alt: image?.alt ?? 'Render image',
+    width: image?.width ?? 1600,
+    height: image?.height ?? 1000,
   }
 }
 

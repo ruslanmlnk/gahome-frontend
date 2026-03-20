@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import GridSection from '@/components/GridSection'
 import { graphqlClient } from '@/src/lib/graphqlClient'
+import { resolveMediaUrl } from '@/src/lib/resolveMediaUrl'
 
 const GET_HOME_QUERY = /* GraphQL */ `
   query GetHomePage {
@@ -75,7 +76,8 @@ const mapItem = (src: GQLItem) => {
   if (!src) return undefined
 
   const title = src.title ?? undefined
-  const url = src.image?.url ?? undefined
+  const url = resolveMediaUrl(src.image?.url)
+  const videoPoster = src.image?.videoPoster
 
   if (!url) {
     return { title }
@@ -87,10 +89,10 @@ const mapItem = (src: GQLItem) => {
       url,
       alt: src.image?.alt ?? '',
       mimeType: src.image?.mimeType ?? null,
-      videoPoster: src.image?.videoPoster?.url
+      videoPoster: resolveMediaUrl(videoPoster?.url)
         ? {
-            url: src.image.videoPoster.url,
-            alt: src.image.videoPoster.alt ?? '',
+            url: resolveMediaUrl(videoPoster?.url),
+            alt: videoPoster?.alt ?? '',
           }
         : null,
     },
@@ -130,11 +132,11 @@ const pickPreviewImage = (home: HomeQueryResult['Home'] | null) => {
     if (!asset?.url) continue
 
     if (asset.mimeType?.startsWith('video/')) {
-      if (asset.videoPoster?.url) return asset.videoPoster.url
+      if (asset.videoPoster?.url) return resolveMediaUrl(asset.videoPoster.url)
       continue
     }
 
-    return asset.url
+    return resolveMediaUrl(asset.url)
   }
 
   return '/images/grid/1.png'

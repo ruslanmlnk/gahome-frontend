@@ -59,7 +59,7 @@ export default function HomeGridMedia({
     }
 
     return (
-      <div className="absolute inset-0 overflow-hidden bg-[#0F0F0F]">
+      <div className="absolute inset-0 overflow-hidden bg-transparent">
         {isPlaying ? (
           <video
             ref={videoRef}
@@ -69,7 +69,7 @@ export default function HomeGridMedia({
             playsInline
             preload="metadata"
             poster={posterVariant?.url ?? undefined}
-            className="h-full w-full object-contain"
+            className={className}
           >
             <source src={asset.url} type={asset.mimeType ?? undefined} />
           </video>
@@ -81,10 +81,10 @@ export default function HomeGridMedia({
             unoptimized={shouldUnoptimizeImage(posterVariant.url)}
             fill
             sizes={sizes}
-            className="object-contain"
+            className={className}
           />
         ) : (
-          <div className="h-full w-full bg-[#0F0F0F]" />
+          <div className="h-full w-full bg-transparent" />
         )}
 
         {!isPlaying ? (

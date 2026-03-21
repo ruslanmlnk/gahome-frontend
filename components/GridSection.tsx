@@ -21,6 +21,20 @@ type Props = {
   }
 }
 
+function getAssetAspectRatio(asset?: MediaAsset | null): number {
+  const source =
+    asset?.mimeType?.startsWith('video/')
+      ? (asset.videoPoster ?? asset)
+      : asset
+
+  const width = Number(source?.width)
+  const height = Number(source?.height)
+
+  if (!width || !height) return 16 / 9
+
+  return width / height
+}
+
 const defaultAssets: MediaAsset[] = [
   { url: '/images/grid/1.png', alt: 'Best location' },
   { url: '/images/grid/2.png', alt: 'Best location' },
@@ -57,11 +71,15 @@ export default function GridSection({ gridSection }: Props) {
 
   const item8Href = gridSection?.item8?.href
   const mediaClassName = 'object-cover object-center w-full h-full'
+  const firstBlockAspectRatio = getAssetAspectRatio(items[0])
 
   return (
     <section className="w-full 2xl:max-w-[1920px] mx-auto 2xl:pt-[15px] 2xl:pb-[120px] xl:pb-[85px] xl:pt-[10px] md:pt-[5px] pt-[32px] md:pb-[55px] pb-[55px] grid gap-[5px] xl:gap-[10px] 2xl:gap-[15px]">
-      <section className="w-full 2xl:h-[692px] xl:h-[480px] lg:h-[410px] md:h-[360px] h-[312px] relative">
-        <Link href="/dream" className="block w-full h-full">
+      <section
+        className="relative w-full overflow-hidden bg-transparent"
+        style={{ aspectRatio: firstBlockAspectRatio }}
+      >
+        <Link href="/dream" className="relative block w-full h-full">
           <HomeGridMedia
             asset={items[0]}
             title={itemTitles[0]}

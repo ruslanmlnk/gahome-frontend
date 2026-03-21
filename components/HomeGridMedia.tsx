@@ -8,6 +8,10 @@ import {
   type MediaSizeName,
   type MediaWithSizes,
 } from '@/src/lib/pickMediaVariant'
+import {
+  buildPayloadResponsiveSrc,
+  payloadResponsiveImageLoader,
+} from '@/src/lib/payloadResponsiveImage'
 import { shouldUnoptimizeImage } from '@/src/lib/shouldUnoptimizeImage'
 
 type PosterAsset = {
@@ -42,11 +46,12 @@ export default function HomeGridMedia({
   const isVideo = asset.mimeType?.startsWith('video/')
   const [isPlaying, setIsPlaying] = useState(false)
   const videoRef = useRef<HTMLVideoElement | null>(null)
+  const imageSrc = buildPayloadResponsiveSrc(asset, preferredSizes)
 
   if (isVideo) {
-    const posterVariant =
-      pickMediaVariant(asset.videoPoster, preferredSizes) ??
-      pickMediaVariant(asset, preferredSizes)
+    const posterMedia = asset.videoPoster ?? asset
+    const posterVariant = pickMediaVariant(posterMedia, preferredSizes)
+    const posterSrc = buildPayloadResponsiveSrc(posterMedia, preferredSizes)
 
     const startPlayback = (event: MouseEvent<HTMLButtonElement>) => {
       event.preventDefault()
@@ -75,10 +80,11 @@ export default function HomeGridMedia({
           </video>
         ) : posterVariant ? (
           <Image
-            src={posterVariant.url}
+            src={posterSrc ?? posterVariant.url}
             alt={posterVariant.alt || title || 'GA Home Design'}
             priority={priority}
-            unoptimized={shouldUnoptimizeImage(posterVariant.url)}
+            loader={posterSrc ? payloadResponsiveImageLoader : undefined}
+            unoptimized={posterSrc ? false : shouldUnoptimizeImage(posterVariant.url)}
             fill
             sizes={sizes}
             className={className}
@@ -117,10 +123,11 @@ export default function HomeGridMedia({
 
   return (
     <Image
-      src={variant.url}
+      src={imageSrc ?? variant.url}
       alt={variant.alt || title || 'GA Home Design'}
       priority={priority}
-      unoptimized={shouldUnoptimizeImage(variant.url)}
+      loader={imageSrc ? payloadResponsiveImageLoader : undefined}
+      unoptimized={imageSrc ? false : shouldUnoptimizeImage(variant.url)}
       fill
       sizes={sizes}
       className={className}

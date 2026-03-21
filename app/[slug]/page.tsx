@@ -4,6 +4,10 @@ import GridContent from '@/components/GridContent'
 import VideoGrid from '@/components/VideoGrid'
 import { graphqlClient } from '@/src/lib/graphqlClient'
 import { pickMediaVariant, type MediaSizeVariant, type MediaWithSizes } from '@/src/lib/pickMediaVariant'
+import {
+  buildPayloadResponsiveSrc,
+  payloadResponsiveImageLoader,
+} from '@/src/lib/payloadResponsiveImage'
 import { resolveMediaUrl } from '@/src/lib/resolveMediaUrl'
 import { shouldUnoptimizeImage } from '@/src/lib/shouldUnoptimizeImage'
 import Image from 'next/image'
@@ -260,8 +264,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           className="2xl:max-w-[1920px] mx-auto mt-[42px] md:mt-[19px] lg:mt-[15px] xl:mt-[18px] 2xl:mt-[53px] 2xl:pb-[120px] xl:pb-[85px] md:pb-[55px] pb-[22px]"
           items={page.videos
             .map((v) => ({
-              poster:
-                pickMediaVariant(v?.poster as MediaWithSizes, ['card', 'tablet', 'desktop'])?.url ?? '',
+              poster: v?.poster as MediaWithSizes,
               href: resolveMediaUrl(v?.video_file?.url),
               title: undefined,
             }))
@@ -273,19 +276,21 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         <section className="w-full relative h-[173px] md:h-[360px] lg:h-[410px] xl:h-[480px] 2xl:h-[692px] mb-[23px]  md:mb-[45px] lg:mb-[55px]  mt-[32px] xl:mt-[47px] xl:mb-[85px] 2xl:mb-[120px] 2xl:mt-[62px] max-w-[1920px] mx-auto">
           {(() => {
             const heroVariant = pickMediaVariant(page.hero_image as MediaWithSizes, ['desktop', 'tablet', 'card'])
+            const heroSrc = buildPayloadResponsiveSrc(page.hero_image as MediaWithSizes, ['card', 'tablet', 'desktop'])
 
             if (!heroVariant) return null
 
             return (
-          <Image
-            src={heroVariant.url}
-            alt="GA Home Design"
-            priority
-            unoptimized={shouldUnoptimizeImage(heroVariant.url)}
-            fill
-            sizes="100vw"
-            className="object-cover"
-          />
+              <Image
+                src={heroSrc ?? heroVariant.url}
+                alt="GA Home Design"
+                priority
+                loader={heroSrc ? payloadResponsiveImageLoader : undefined}
+                unoptimized={heroSrc ? false : shouldUnoptimizeImage(heroVariant.url)}
+                fill
+                sizes="100vw"
+                className="object-cover"
+              />
             )
           })()}
         </section>

@@ -1,10 +1,15 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
+import { type MediaWithSizes, pickMediaVariant } from "@/src/lib/pickMediaVariant";
+import {
+    buildPayloadResponsiveSrc,
+    payloadResponsiveImageLoader,
+} from "@/src/lib/payloadResponsiveImage";
 import { resolveMediaUrl } from "@/src/lib/resolveMediaUrl";
 import { shouldUnoptimizeImage } from "@/src/lib/shouldUnoptimizeImage";
 
-type VideoItem = { poster: string; href?: string; title?: string };
+type VideoItem = { poster: string | MediaWithSizes; href?: string; title?: string };
 type VideoGridProps = { items: VideoItem[]; className?: string };
 
 export default function VideoGrid({ items, className = "" }: VideoGridProps) {
@@ -21,7 +26,16 @@ export default function VideoGrid({ items, className = "" }: VideoGridProps) {
             {items.map((v, i) => {
                 const isActive = activeIndex === i;
                 const videoUrl = v.href ?? "";
-                const posterUrl = resolveMediaUrl(v.poster);
+                const posterMedia = typeof v.poster === "string" ? null : v.poster;
+                const posterVariant = posterMedia
+                    ? pickMediaVariant(posterMedia, ['card', 'tablet', 'desktop'])
+                    : null;
+                const responsivePosterSrc = posterMedia
+                    ? buildPayloadResponsiveSrc(posterMedia, ['card', 'tablet', 'desktop'])
+                    : null;
+                const posterUrl = resolveMediaUrl(
+                    typeof v.poster === "string" ? v.poster : posterVariant?.url,
+                );
                 const embedUrl = isYouTube(videoUrl)
                     ? videoUrl.replace("watch?v=", "embed/")
                     : isVimeo(videoUrl)
@@ -44,13 +58,14 @@ export default function VideoGrid({ items, className = "" }: VideoGridProps) {
                         ) : (
                             <>
                                 <Image
-                                    src={posterUrl}
+                                    src={responsivePosterSrc ?? posterUrl}
                                     alt={v.title || "Video poster"}
-                                    unoptimized={shouldUnoptimizeImage(posterUrl)}
+                                    loader={responsivePosterSrc ? payloadResponsiveImageLoader : undefined}
+                                    unoptimized={responsivePosterSrc ? false : shouldUnoptimizeImage(posterUrl)}
                                     fill
                                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                                     loading="lazy"
-                                    sizes="100vw"
+                                    sizes="(max-width: 767px) 100vw, 33vw"
                                 />
 
                                 <button

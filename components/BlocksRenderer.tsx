@@ -3,10 +3,14 @@
 import Image from 'next/image'
 import RendersBlock from '@/components/RendersBlock'
 import {
+  type MediaSizeName,
   pickMediaVariant,
   type MediaWithSizes,
-  type PickedMediaVariant,
 } from '@/src/lib/pickMediaVariant'
+import {
+  buildPayloadResponsiveSrc,
+  payloadResponsiveImageLoader,
+} from '@/src/lib/payloadResponsiveImage'
 import { shouldUnoptimizeImage } from '@/src/lib/shouldUnoptimizeImage'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -71,12 +75,11 @@ function ParagraphView({ block }: { block: AnyBlock }) {
 }
 
 function GalleryView({ block }: { block: AnyBlock }) {
-  const items: PickedMediaVariant[] = Array.isArray(block?.items)
+  const preferredSizes: MediaSizeName[] = ['card', 'tablet', 'desktop']
+  const items: MediaWithSizes[] = Array.isArray(block?.items)
     ? block.items
-        .map((item: AnyBlock) => {
-          return pickMediaVariant(item?.image as MediaWithSizes, ['card', 'tablet', 'desktop'])
-        })
-        .filter((image): image is PickedMediaVariant => Boolean(image?.url))
+        .map((item: AnyBlock) => item?.image as MediaWithSizes)
+        .filter((image): image is MediaWithSizes => Boolean(image?.url))
     : []
 
   if (!items.length) return null
@@ -86,20 +89,30 @@ function GalleryView({ block }: { block: AnyBlock }) {
       <div className="mx-auto w-full max-w-[1920px]">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-[10px] xl:gap-[15px] items-start">
           {items.map((image, index) => (
-            <div
-              key={`${image.url}-${index}`}
-              className="group overflow-hidden bg-[#F5F5F5]"
-            >
-              <Image
-                src={image.url}
-                alt={image.alt || 'Gallery image'}
-                unoptimized={shouldUnoptimizeImage(image.url)}
-                width={Number(image.width) || 1600}
-                height={Number(image.height) || 1200}
-                sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 33vw"
-                className="h-auto w-full transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-              />
-            </div>
+            (() => {
+              const imageVariant = pickMediaVariant(image, preferredSizes)
+              const responsiveSrc = buildPayloadResponsiveSrc(image, preferredSizes)
+
+              if (!imageVariant) return null
+
+              return (
+                <div
+                  key={`${imageVariant.url}-${index}`}
+                  className="group overflow-hidden bg-[#F5F5F5]"
+                >
+                  <Image
+                    src={responsiveSrc ?? imageVariant.url}
+                    alt={imageVariant.alt || 'Gallery image'}
+                    loader={responsiveSrc ? payloadResponsiveImageLoader : undefined}
+                    unoptimized={responsiveSrc ? false : shouldUnoptimizeImage(imageVariant.url)}
+                    width={Number(imageVariant.width) || 1600}
+                    height={Number(imageVariant.height) || 1200}
+                    sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 33vw"
+                    className="h-auto w-full transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                  />
+                </div>
+              )
+            })()
           ))}
         </div>
       </div>

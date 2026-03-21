@@ -1,16 +1,12 @@
 import BlocksRenderer from '@/components/BlocksRenderer'
 import FIleDownload from '@/components/FileDownload'
 import GridContent from '@/components/GridContent'
+import ResponsiveCmsImage from '@/components/ResponsiveCmsImage'
 import VideoGrid from '@/components/VideoGrid'
 import { graphqlClient } from '@/src/lib/graphqlClient'
 import { pickMediaVariant, type MediaSizeVariant, type MediaWithSizes } from '@/src/lib/pickMediaVariant'
-import {
-  buildPayloadResponsiveSrc,
-  payloadResponsiveImageLoader,
-} from '@/src/lib/payloadResponsiveImage'
+import { buildPayloadResponsiveSrc } from '@/src/lib/payloadResponsiveImage'
 import { resolveMediaUrl } from '@/src/lib/resolveMediaUrl'
-import { shouldUnoptimizeImage } from '@/src/lib/shouldUnoptimizeImage'
-import Image from 'next/image'
 import { notFound } from 'next/navigation'
 
 const GET_PAGE_QUERY = /* GraphQL */ `
@@ -281,12 +277,11 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             if (!heroVariant) return null
 
             return (
-              <Image
-                src={heroSrc ?? heroVariant.url}
+              <ResponsiveCmsImage
+                src={heroVariant.url}
+                responsiveSrc={heroSrc}
                 alt="GA Home Design"
                 priority
-                loader={heroSrc ? payloadResponsiveImageLoader : undefined}
-                unoptimized={heroSrc ? false : shouldUnoptimizeImage(heroVariant.url)}
                 fill
                 sizes="100vw"
                 className="object-cover"

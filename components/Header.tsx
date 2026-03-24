@@ -102,13 +102,13 @@ export default function Header(): JSX.Element {
       <div className="w-full border-b border-gray-200 hidden xl:flex">
         <div className="mx-auto hidden w-full max-w-[1440px] h-[127px] 2xl:h-[148px] 2xl:max-w-[1920px] items-center justify-between px-9 2xl:px-[48px] xl:flex">
           {/* Left nav */}
-          <nav className="flex-1">
-            <ul className="flex items-center gap-[50px] 2xl:gap-[80px]">
+          <nav className="flex-1 pr-[40px] 2xl:pr-[60px]">
+            <ul className="flex w-full items-center justify-between">
               {leftLinks.map(({ label, href }) => (
                 <li key={label}>
                   <Link
                     href={href}
-                    className="text-[18px] 2xl:text-[24px] leading-[13px] 2xl:leading-[20px] font-medium uppercase"
+                    className="text-[14px] xl:text-[16px] 2xl:text-[24px] leading-[13px] 2xl:leading-[20px] font-medium uppercase whitespace-nowrap"
                   >
                     {label}
                   </Link>
@@ -118,7 +118,7 @@ export default function Header(): JSX.Element {
           </nav>
 
           {/* Center logo block */}
-          <Link href="/" className="flex items-center justify-center h-full w-[212.93px] 2xl:w-[278px] mx-[77.54px_63.54px] 2xl:[81px_61px]">
+          <Link href="/" className="flex shrink-0 items-center justify-center h-full w-[212.93px] 2xl:w-[278px]">
             <div className="flex h-full w-full items-center justify-center bg-black border border-[#E7E7E7] p-6">
               <Image
                 src="/images/logo.svg"
@@ -131,13 +131,13 @@ export default function Header(): JSX.Element {
           </Link>
 
           {/* Right nav */}
-          <nav className="flex-1 flex justify-end">
-            <ul className="flex items-center gap-[50px] 2xl:gap-[80px]">
+          <nav className="flex-1 pl-[40px] 2xl:pl-[60px]">
+            <ul className="flex w-full items-center justify-between">
               {rightLinks.map(({ label, href }) => (
                 <li key={label}>
                   <Link
                     href={href}
-                    className="text-[18px] 2xl:text-[24px] leading-[13px] 2xl:leading-[20px] font-medium uppercase"
+                    className="text-[14px] xl:text-[16px] 2xl:text-[24px] leading-[13px] 2xl:leading-[20px] font-medium uppercase whitespace-nowrap"
                   >
                     {label}
                   </Link>

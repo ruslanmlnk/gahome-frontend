@@ -79,7 +79,7 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
   const [activeRender, setActiveRender] = useState(0)
   const [openRender, setOpenRender] = useState<number | null>(null)
   const [activeSlide, setActiveSlide] = useState(0)
-  const cardRefs = useRef<Array<HTMLElement | null>>([])
+  const cardRefs = useRef<Array<HTMLButtonElement | null>>([])
 
   useEffect(() => {
     if (!renders.length) {
@@ -172,6 +172,8 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
       ? openedRender.slides[Math.min(activeSlide, openedRender.slides.length - 1)]
       : null
 
+  const showGalleryNav = !isSingleRender && openedRender && openedRender.slides.length > 1
+
   const openGallery = (index: number, slideIndex = 0) => {
     setActiveRender(index)
     setOpenRender(index)
@@ -241,11 +243,13 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
                 <div className="overflow-x-auto px-[10px] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden md:px-[44px]">
                   <div className="flex items-stretch gap-[12px] py-1 md:gap-[18px] xl:gap-[22px]">
                     {singleRender.slides.map((slide, index) => (
-                      <div
+                      <button
                         key={`${slide.url}-${index}`}
                         ref={(element) => {
                           cardRefs.current[index] = element
                         }}
+                        type="button"
+                        onClick={() => openGallery(0, index)}
                         className={`group relative w-[84vw] shrink-0 snap-center overflow-hidden rounded-[20px] border bg-[#F5F5F5] text-left transition duration-300 md:w-[58vw] xl:w-[38vw] ${
                           index === activeSlide
                             ? 'border-[#131313] shadow-[0_20px_50px_rgba(0,0,0,0.12)]'
@@ -272,7 +276,7 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
                             </div>
                           )
                         })()}
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -393,7 +397,7 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
             <span className="text-xl leading-none">&times;</span>
           </button>
 
-          {openedRender.slides.length > 1 ? (
+          {showGalleryNav ? (
             <>
               <button
                 type="button"
@@ -437,13 +441,17 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
             </div>
 
             <div className="flex items-center justify-between text-white">
-              <span className="text-[14px] md:text-[16px]">
-                {activeSlide + 1} / {openedRender.slides.length}
-              </span>
+              {showGalleryNav ? (
+                <span className="text-[14px] md:text-[16px]">
+                  {activeSlide + 1} / {openedRender.slides.length}
+                </span>
+              ) : (
+                <span />
+              )}
               <span className="text-[12px] opacity-70 md:text-[14px]">ESC to close</span>
             </div>
 
-            {openedRender.slides.length > 1 ? (
+            {showGalleryNav ? (
               <div className="flex gap-3 overflow-x-auto pb-1">
                 {openedRender.slides.map((slide, index) => (
                   <button

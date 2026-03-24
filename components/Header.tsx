@@ -7,11 +7,11 @@ import { useEffect, useState, type JSX } from 'react'
 const leftLinks: { label: string; href: Route }[] = [
   { label: 'LOCATION', href: '/location' as Route },
   { label: 'MORTGAGE', href: '/mortgage' as Route },
-  { label: '3D VISUALISATION', href: '/visualisation' as Route },
+  { label: 'Custom Home Visualization', href: '/visualisation' as Route },
 ]
 
 const rightLinks: { label: string; href: Route }[] = [
-  { label: 'DOUBLE SAVINGS', href: '/savings' as Route },
+  { label: 'Smart Cost Advantages', href: '/savings' as Route },
   { label: 'OUR CLIENTS', href: '/owners' as Route },
   { label: 'INNOVATIONS', href: '/innovations' as Route },
 ]
@@ -21,7 +21,7 @@ const menuLinks: { label: string; href: Route }[] = [...leftLinks, ...rightLinks
 
 export default function Header(): JSX.Element {
   const [open, setOpen] = useState(false)
-  
+
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (typeof document === 'undefined') return
@@ -149,7 +149,7 @@ export default function Header(): JSX.Element {
       </div>
 
 
-       {open && (
+      {open && (
         <div className="fixed left-0 right-0 bottom-0 top-[149px] md:top-[130px] xl:hidden z-40 bg-white/70 backdrop-blur-xl flex flex-col items-center pt-10 gap-8 text-[#131313] uppercase text-[22px] font-medium transition-all duration-300">
           {menuLinks.map(({ label, href }) => (
             <Link

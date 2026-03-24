@@ -79,7 +79,7 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
   const [activeRender, setActiveRender] = useState(0)
   const [openRender, setOpenRender] = useState<number | null>(null)
   const [activeSlide, setActiveSlide] = useState(0)
-  const cardRefs = useRef<Array<HTMLButtonElement | null>>([])
+  const cardRefs = useRef<Array<HTMLElement | null>>([])
 
   useEffect(() => {
     if (!renders.length) {
@@ -140,7 +140,16 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
     }
   }, [openRender, renders])
 
+  const initialScrollDone = useRef(false)
+
   useEffect(() => {
+    if (!renders.length) return
+
+    if (!initialScrollDone.current) {
+      initialScrollDone.current = true
+      return
+    }
+
     const targetIndex = renders.length === 1 ? activeSlide : activeRender
     const activeCard = cardRefs.current[targetIndex]
     if (!activeCard) return
@@ -232,13 +241,11 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
                 <div className="overflow-x-auto px-[10px] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden md:px-[44px]">
                   <div className="flex items-stretch gap-[12px] py-1 md:gap-[18px] xl:gap-[22px]">
                     {singleRender.slides.map((slide, index) => (
-                      <button
+                      <div
                         key={`${slide.url}-${index}`}
                         ref={(element) => {
                           cardRefs.current[index] = element
                         }}
-                        type="button"
-                        onClick={() => openGallery(0, index)}
                         className={`group relative w-[84vw] shrink-0 snap-center overflow-hidden rounded-[20px] border bg-[#F5F5F5] text-left transition duration-300 md:w-[58vw] xl:w-[38vw] ${
                           index === activeSlide
                             ? 'border-[#131313] shadow-[0_20px_50px_rgba(0,0,0,0.12)]'
@@ -265,11 +272,7 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
                             </div>
                           )
                         })()}
-
-                        <div className="absolute bottom-4 right-4 rounded-full bg-black/70 px-3 py-1 text-[12px] text-white md:text-[14px]">
-                          {singleRender.slides.length} views
-                        </div>
-                      </button>
+                      </div>
                     ))}
                   </div>
                 </div>

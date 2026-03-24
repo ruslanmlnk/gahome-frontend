@@ -43,7 +43,9 @@ export default function HomeGridMedia({
   preferredSizes,
   priority = false,
 }: Props): JSX.Element {
-  const isVideo = asset.mimeType?.startsWith('video/')
+  const isVideo =
+    asset.mimeType?.startsWith('video/') ||
+    asset.url.match(/\.(mp4|webm|mov|ogg)$/i)
   const [isPlaying, setIsPlaying] = useState(false)
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const imageSrc = buildPayloadResponsiveSrc(asset, preferredSizes)
@@ -52,6 +54,12 @@ export default function HomeGridMedia({
     const posterMedia = asset.videoPoster ?? asset
     const posterVariant = pickMediaVariant(posterMedia, preferredSizes)
     const posterSrc = buildPayloadResponsiveSrc(posterMedia, preferredSizes)
+
+    const isPosterVideo =
+      posterVariant?.mimeType?.startsWith('video/') ||
+      posterVariant?.url.match(/\.(mp4|webm|mov|ogg)$/i)
+
+    const shouldRenderImagePoster = posterVariant && !isPosterVideo
 
     const startPlayback = (event: MouseEvent<HTMLButtonElement>) => {
       event.preventDefault()
@@ -65,20 +73,20 @@ export default function HomeGridMedia({
 
     return (
       <div className="absolute inset-0 overflow-hidden bg-transparent">
-        {isPlaying ? (
+        {isPlaying || !shouldRenderImagePoster ? (
           <video
             ref={videoRef}
-            autoPlay
+            autoPlay={isPlaying}
             muted
             loop
             playsInline
             preload="metadata"
-            poster={posterVariant?.url ?? undefined}
+            poster={shouldRenderImagePoster ? posterVariant.url : undefined}
             className={className}
           >
             <source src={asset.url} type={asset.mimeType ?? undefined} />
           </video>
-        ) : posterVariant ? (
+        ) : (
           <Image
             src={posterSrc ?? posterVariant.url}
             alt={posterVariant.alt || title || 'GA Home Design'}
@@ -89,8 +97,6 @@ export default function HomeGridMedia({
             sizes={sizes}
             className={className}
           />
-        ) : (
-          <div className="h-full w-full bg-transparent" />
         )}
 
         {!isPlaying ? (

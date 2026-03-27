@@ -5,7 +5,7 @@ query GetHome {
       metaDescription
     }
     gridSection {
-      item1 { title image { url alt mimeType videoPoster { url alt } } }
+      item1 { title youtubeUrl image { url alt mimeType videoPoster { url alt } } }
       item2 { title image { url alt mimeType videoPoster { url alt } } }
       item3 { title image { url alt mimeType videoPoster { url alt } } }
       item4 { title image { url alt mimeType videoPoster { url alt } } }
@@ -86,6 +86,16 @@ query GetPageBySlug($slug: String!) {
                 height
               }
             }
+          }
+        }
+        ... on Video {
+          title
+          youtubeUrl
+          poster {
+            url
+            alt
+            width
+            height
           }
         }
         ... on ReadMore {

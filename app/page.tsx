@@ -13,7 +13,7 @@ const GET_HOME_QUERY = /* GraphQL */ `
         metaDescription
       }
       gridSection {
-        item1 { title image { url alt mimeType width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } videoPoster { url alt width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } } } }
+        item1 { title youtubeUrl image { url alt mimeType width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } videoPoster { url alt width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } } } }
         item2 { title image { url alt mimeType width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } videoPoster { url alt width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } } } }
         item3 { title image { url alt mimeType width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } videoPoster { url alt width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } } } }
         item4 { title image { url alt mimeType width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } videoPoster { url alt width height sizes { thumbnail { url width height mimeType } card { url width height mimeType } tablet { url width height mimeType } desktop { url width height mimeType } } } } }
@@ -45,6 +45,7 @@ type MediaAsset = {
   url: string | null
   alt: string | null
   mimeType: string | null
+  youtubeUrl?: string | null
   width?: number | null
   height?: number | null
   sizes?: SizeMap
@@ -54,6 +55,7 @@ type MediaAsset = {
 type GQLItem = {
   title: string | null
   href?: string | null
+  youtubeUrl?: string | null
   image: MediaAsset
 } | null | undefined
 
@@ -106,6 +108,7 @@ const mapItem = (src: GQLItem) => {
       width: src.image?.width ?? null,
       height: src.image?.height ?? null,
       sizes: src.image?.sizes ?? null,
+      youtubeUrl: src.youtubeUrl ?? null,
       videoPoster: resolveMediaUrl(videoPoster?.url)
         ? {
             url: resolveMediaUrl(videoPoster?.url),

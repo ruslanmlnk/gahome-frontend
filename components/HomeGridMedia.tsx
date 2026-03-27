@@ -13,6 +13,7 @@ import {
   payloadResponsiveImageLoader,
 } from '@/src/lib/payloadResponsiveImage'
 import { shouldUnoptimizeImage } from '@/src/lib/shouldUnoptimizeImage'
+import { getEmbedVideoUrl, isVideoFileUrl } from '@/src/lib/videoEmbed'
 
 type PosterAsset = {
   url: string
@@ -24,6 +25,7 @@ export type HomeGridMediaAsset = MediaWithSizes & {
   alt?: string | null
   mimeType?: string | null
   videoPoster?: PosterAsset | null
+  youtubeUrl?: string | null
 }
 
 type Props = {
@@ -43,11 +45,12 @@ export default function HomeGridMedia({
   preferredSizes,
   priority = false,
 }: Props): JSX.Element {
-  const isVideo =
-    asset.mimeType?.startsWith('video/') ||
-    asset.url.match(/\.(mp4|webm|mov|ogg)$/i)
   const [isPlaying, setIsPlaying] = useState(false)
   const videoRef = useRef<HTMLVideoElement | null>(null)
+  const externalVideoUrl = asset.youtubeUrl?.trim() || null
+  const embedUrl = getEmbedVideoUrl(externalVideoUrl, isPlaying)
+  const isEmbeddedVideo = Boolean(getEmbedVideoUrl(externalVideoUrl))
+  const isVideo = isEmbeddedVideo || asset.mimeType?.startsWith('video/') || isVideoFileUrl(asset.url)
   const imageSrc = buildPayloadResponsiveSrc(asset, preferredSizes)
 
   if (isVideo) {
@@ -66,26 +69,39 @@ export default function HomeGridMedia({
       event.stopPropagation()
       setIsPlaying(true)
 
-      requestAnimationFrame(() => {
-        void videoRef.current?.play().catch(() => {})
-      })
+      if (!isEmbeddedVideo) {
+        requestAnimationFrame(() => {
+          void videoRef.current?.play().catch(() => {})
+        })
+      }
     }
 
     return (
       <div className="absolute inset-0 overflow-hidden bg-transparent">
         {isPlaying || !shouldRenderImagePoster ? (
-          <video
-            ref={videoRef}
-            autoPlay={isPlaying}
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            poster={shouldRenderImagePoster ? posterVariant.url : undefined}
-            className={className}
-          >
-            <source src={asset.url} type={asset.mimeType ?? undefined} />
-          </video>
+          isEmbeddedVideo && embedUrl ? (
+            <iframe
+              key={embedUrl}
+              src={embedUrl}
+              title={title || 'Video'}
+              allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+              allowFullScreen
+              className={className}
+            />
+          ) : (
+            <video
+              ref={videoRef}
+              autoPlay={isPlaying}
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              poster={shouldRenderImagePoster ? posterVariant.url : undefined}
+              className={className}
+            >
+              <source src={asset.url} type={asset.mimeType ?? undefined} />
+            </video>
+          )
         ) : (
           <Image
             src={posterSrc ?? posterVariant.url}
@@ -104,9 +120,9 @@ export default function HomeGridMedia({
             type="button"
             aria-label={`Play ${title || 'video'}`}
             onClick={startPlayback}
-            className="absolute inset-0 z-20 flex items-center justify-center bg-black/8 transition hover:bg-black/16"
+            className="absolute inset-0 z-20 flex items-center justify-center bg-transparent transition"
           >
-            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/92 text-[#131313] shadow-lg md:h-20 md:w-20">
+            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-[#131313] shadow-lg md:h-20 md:w-20">
               <svg
                 aria-hidden="true"
                 viewBox="0 0 24 24"

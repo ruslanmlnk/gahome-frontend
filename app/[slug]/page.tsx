@@ -113,6 +113,22 @@ const GET_PAGE_QUERY = /* GraphQL */ `
               }
             }
           }
+          ... on Video {
+            title
+            youtubeUrl
+            poster {
+              url
+              alt
+              width
+              height
+              sizes {
+                thumbnail { url width height mimeType }
+                card { url width height mimeType }
+                tablet { url width height mimeType }
+                desktop { url width height mimeType }
+              }
+            }
+          }
           ... on ReadMore {
             label
           }

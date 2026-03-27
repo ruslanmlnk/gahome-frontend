@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import HomeGridMedia, { type HomeGridMediaAsset } from '@/components/HomeGridMedia'
 import RendersBlock from '@/components/RendersBlock'
 import {
   type MediaSizeName,
@@ -34,6 +35,10 @@ const isGallery = (b: AnyBlock) =>
 const isRenders = (b: AnyBlock) =>
   ['renders', 'rendersblock'].includes(getT(b)) ||
   (Array.isArray(b?.items) && b.items.some((item: AnyBlock) => 'mainImage' in (item ?? {})))
+
+const isVideo = (b: AnyBlock) =>
+  ['video', 'videoblock'].includes(getT(b)) ||
+  ('youtubeUrl' in (b ?? {}) && 'poster' in (b ?? {}))
 
 const isReadMore = (b: AnyBlock) =>
   ['readmore', 'readmoreblock'].includes(getT(b)) || b?.type === 'ReadMore'
@@ -120,9 +125,44 @@ function GalleryView({ block }: { block: AnyBlock }) {
   )
 }
 
+function getMediaAspectRatio(media?: MediaWithSizes | null): number {
+  const width = Number(media?.width)
+  const height = Number(media?.height)
+
+  if (!width || !height) return 16 / 9
+
+  return width / height
+}
+
+function VideoView({ block }: { block: AnyBlock }) {
+  const poster = block?.poster as MediaWithSizes | null
+  const youtubeUrl = String(block?.youtubeUrl ?? '').trim()
+  const title = String(block?.title ?? 'Video').trim()
+
+  if (!youtubeUrl || !poster?.url) return null
+
+  return (
+    <section className="w-full mt-[12px] md:mt-[20px] lg:mt-[24px]">
+      <div
+        className="relative mx-auto w-full max-w-[1920px] overflow-hidden bg-[#131313]"
+        style={{ aspectRatio: getMediaAspectRatio(poster) }}
+      >
+        <HomeGridMedia
+          asset={{ ...(poster as HomeGridMediaAsset), youtubeUrl }}
+          title={title}
+          sizes="100vw"
+          preferredSizes={['desktop', 'tablet', 'card']}
+          className="object-cover object-center w-full h-full"
+        />
+      </div>
+    </section>
+  )
+}
+
 function renderBlock(block: AnyBlock, key: string) {
   if (isTitle(block)) return <TitleView key={key} block={block} />
   if (isParagraph(block)) return <ParagraphView key={key} block={block} />
+  if (isVideo(block)) return <VideoView key={key} block={block} />
   if (isGallery(block)) return <GalleryView key={key} block={block} />
   if (isRenders(block)) return <RendersBlock key={key} items={block?.items} />
   return null

@@ -114,7 +114,6 @@ const GET_PAGE_QUERY = /* GraphQL */ `
             }
           }
           ... on Video {
-            title
             youtubeUrl
             poster {
               url
@@ -199,9 +198,7 @@ type PageQueryResult = {
 }
 
 const fetchPage = async (slug: string) => {
-  const result = await graphqlClient
-    .request<PageQueryResult>(GET_PAGE_QUERY, { slug })
-    .catch(() => ({ Pages: null }))
+  const result = await graphqlClient.request<PageQueryResult>(GET_PAGE_QUERY, { slug })
 
   return result.Pages?.docs?.[0] ?? null
 }

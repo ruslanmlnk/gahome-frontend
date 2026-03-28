@@ -89,7 +89,6 @@ query GetPageBySlug($slug: String!) {
           }
         }
         ... on Video {
-          title
           youtubeUrl
           poster {
             url

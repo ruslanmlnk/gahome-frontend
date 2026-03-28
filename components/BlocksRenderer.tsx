@@ -137,7 +137,6 @@ function getMediaAspectRatio(media?: MediaWithSizes | null): number {
 function VideoView({ block }: { block: AnyBlock }) {
   const poster = block?.poster as MediaWithSizes | null
   const youtubeUrl = String(block?.youtubeUrl ?? '').trim()
-  const title = String(block?.title ?? 'Video').trim()
 
   if (!youtubeUrl || !poster?.url) return null
 
@@ -149,7 +148,7 @@ function VideoView({ block }: { block: AnyBlock }) {
       >
         <HomeGridMedia
           asset={{ ...(poster as HomeGridMediaAsset), youtubeUrl }}
-          title={title}
+          title={poster?.alt || 'Video'}
           sizes="100vw"
           preferredSizes={['desktop', 'tablet', 'card']}
           className="object-cover object-center w-full h-full"

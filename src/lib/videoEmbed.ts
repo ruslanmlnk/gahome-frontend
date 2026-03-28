@@ -1,5 +1,15 @@
 const VIDEO_FILE_PATTERN = /\.(mp4|webm|mov|ogg)(\?.*)?$/i
 
+export type EmbedVideoProvider = 'youtube' | 'vimeo'
+
+type EmbedVideoOptions = {
+  autoplay?: boolean
+  controls?: boolean
+  enableJsApi?: boolean
+  muted?: boolean
+  quality?: 'default' | 'small' | 'medium' | 'large' | 'hd720' | 'hd1080' | 'highres'
+}
+
 function withSearchParams(
   input: string,
   params: Record<string, string | number | undefined>,
@@ -68,20 +78,51 @@ export function isVideoFileUrl(rawUrl?: string | null): boolean {
   return VIDEO_FILE_PATTERN.test(String(rawUrl ?? '').trim())
 }
 
-export function getEmbedVideoUrl(rawUrl?: string | null, autoplay = false): string | null {
+export function getEmbedVideoProvider(rawUrl?: string | null): EmbedVideoProvider | null {
   const normalizedUrl = String(rawUrl ?? '').trim()
 
   if (!normalizedUrl) return null
 
+  if (getYouTubeVideoId(normalizedUrl)) {
+    return 'youtube'
+  }
+
+  if (getVimeoVideoId(normalizedUrl)) {
+    return 'vimeo'
+  }
+
+  return null
+}
+
+export function getEmbedVideoUrl(
+  rawUrl?: string | null,
+  options: EmbedVideoOptions | boolean = false,
+): string | null {
+  const normalizedUrl = String(rawUrl ?? '').trim()
+
+  if (!normalizedUrl) return null
+
+  const {
+    autoplay = false,
+    controls = true,
+    enableJsApi = false,
+    muted = false,
+    quality = 'hd1080',
+  } = typeof options === 'boolean' ? { autoplay: options } : options
+
   const youTubeId = getYouTubeVideoId(normalizedUrl)
 
   if (youTubeId) {
-    return withSearchParams(`https://www.youtube-nocookie.com/embed/${youTubeId}`, {
+    return withSearchParams(`https://www.youtube.com/embed/${youTubeId}`, {
       autoplay: autoplay ? 1 : 0,
-      mute: autoplay ? 1 : 0,
+      controls: controls ? 1 : 0,
+      enablejsapi: enableJsApi ? 1 : 0,
+      fs: 1,
+      iv_load_policy: 3,
+      mute: muted ? 1 : 0,
       playsinline: 1,
       rel: 0,
-      modestbranding: 1,
+      vq: quality === 'default' ? undefined : quality,
     })
   }
 
@@ -90,7 +131,9 @@ export function getEmbedVideoUrl(rawUrl?: string | null, autoplay = false): stri
   if (vimeoId) {
     return withSearchParams(`https://player.vimeo.com/video/${vimeoId}`, {
       autoplay: autoplay ? 1 : 0,
-      muted: autoplay ? 1 : 0,
+      controls: controls ? 1 : 0,
+      muted: muted ? 1 : 0,
+      rel: 0,
       title: 0,
       byline: 0,
       portrait: 0,

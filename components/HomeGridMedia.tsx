@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useRef, useState, type JSX, type MouseEvent } from 'react'
+import { useEffect, useRef, useState, type JSX, type MouseEvent } from 'react'
 
 import {
   pickMediaVariant,
@@ -13,7 +13,7 @@ import {
   payloadResponsiveImageLoader,
 } from '@/src/lib/payloadResponsiveImage'
 import { shouldUnoptimizeImage } from '@/src/lib/shouldUnoptimizeImage'
-import { getEmbedVideoUrl, isVideoFileUrl } from '@/src/lib/videoEmbed'
+import { getEmbedVideoProvider, getEmbedVideoUrl, isVideoFileUrl } from '@/src/lib/videoEmbed'
 
 type PosterAsset = {
   url: string
@@ -46,12 +46,62 @@ export default function HomeGridMedia({
   priority = false,
 }: Props): JSX.Element {
   const [isPlaying, setIsPlaying] = useState(false)
+  const [isYouTubeReady, setIsYouTubeReady] = useState(false)
+  const iframeRef = useRef<HTMLIFrameElement | null>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const externalVideoUrl = asset.youtubeUrl?.trim() || null
-  const embedUrl = getEmbedVideoUrl(externalVideoUrl, isPlaying)
-  const isEmbeddedVideo = Boolean(getEmbedVideoUrl(externalVideoUrl))
+  const embedProvider = getEmbedVideoProvider(externalVideoUrl)
+  const youTubeEmbedUrl =
+    embedProvider === 'youtube'
+      ? getEmbedVideoUrl(externalVideoUrl, {
+          autoplay: false,
+          controls: true,
+          enableJsApi: true,
+          muted: false,
+          quality: 'hd1080',
+        })
+      : null
+  const embedUrl =
+    embedProvider === 'youtube'
+      ? youTubeEmbedUrl
+      : getEmbedVideoUrl(externalVideoUrl, {
+          autoplay: isPlaying,
+          controls: true,
+          muted: false,
+        })
+  const isEmbeddedVideo = Boolean(embedUrl)
   const isVideo = isEmbeddedVideo || asset.mimeType?.startsWith('video/') || isVideoFileUrl(asset.url)
   const imageSrc = buildPayloadResponsiveSrc(asset, preferredSizes)
+
+  useEffect(() => {
+    if (!isPlaying || embedProvider !== 'youtube' || !isYouTubeReady) return
+
+    const iframeWindow = iframeRef.current?.contentWindow
+
+    if (!iframeWindow) return
+
+    const postCommand = (func: string, args: unknown[] = []) => {
+      iframeWindow.postMessage(
+        JSON.stringify({
+          event: 'command',
+          func,
+          args,
+        }),
+        '*',
+      )
+    }
+
+    const timer = window.setTimeout(() => {
+      postCommand('unMute')
+      postCommand('setVolume', [100])
+      postCommand('setPlaybackQuality', ['hd1080'])
+      postCommand('playVideo')
+    }, 150)
+
+    return () => {
+      window.clearTimeout(timer)
+    }
+  }, [embedProvider, isPlaying, isYouTubeReady])
 
   if (isVideo) {
     const posterMedia = asset.videoPoster ?? asset
@@ -69,16 +119,45 @@ export default function HomeGridMedia({
       event.stopPropagation()
       setIsPlaying(true)
 
-      if (!isEmbeddedVideo) {
+      if (embedProvider !== 'youtube' && !isEmbeddedVideo) {
         requestAnimationFrame(() => {
           void videoRef.current?.play().catch(() => {})
         })
       }
     }
 
+    const showPosterOverlay =
+      shouldRenderImagePoster && (!isPlaying || (embedProvider === 'youtube' && !isYouTubeReady))
+
     return (
       <div className="absolute inset-0 overflow-hidden bg-transparent">
-        {isPlaying || !shouldRenderImagePoster ? (
+        {embedProvider === 'youtube' && youTubeEmbedUrl ? (
+          <>
+            <iframe
+              ref={iframeRef}
+              src={youTubeEmbedUrl}
+              title={title || 'Video'}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+              allowFullScreen
+              loading={priority ? 'eager' : 'lazy'}
+              onLoad={() => setIsYouTubeReady(true)}
+              className={`${className} transition-opacity duration-300 ${showPosterOverlay ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
+            />
+
+            {showPosterOverlay ? (
+              <Image
+                src={posterSrc ?? posterVariant.url}
+                alt={posterVariant.alt || title || 'GA Home Design'}
+                priority={priority}
+                loader={posterSrc ? payloadResponsiveImageLoader : undefined}
+                unoptimized={posterSrc ? false : shouldUnoptimizeImage(posterVariant.url)}
+                fill
+                sizes={sizes}
+                className={className}
+              />
+            ) : null}
+          </>
+        ) : isPlaying || !shouldRenderImagePoster ? (
           isEmbeddedVideo && embedUrl ? (
             <iframe
               key={embedUrl}

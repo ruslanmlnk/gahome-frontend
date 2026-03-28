@@ -68,6 +68,18 @@ export default function Footer(): JSX.Element {
         <div className="flex flex-col md:flex-row justify-between">
           <div className="mb-12 md:mb-0">
             <Image src="/images/logo.svg" alt="GA Home Design" width={206} height={100} className='xl:w-[206px] xl:h-[100px] lg:w-[140px] lg:h-[68px] md:w-[123.7px] md:h-[60px] w-[140px] h-[68px]' />
+            <div className="mt-6 flex flex-col gap-2 text-[15px] leading-[22px] md:text-[13px] md:leading-[20px] lg:text-[16px] lg:leading-[24px] xl:text-[18px] xl:leading-[28px] 2xl:text-[22px] 2xl:leading-[34px]">
+              <p className="font-medium text-white">Contact for more information</p>
+              <a href="tel:+13474955316" className="text-[#B7B7B7] transition hover:text-white">
+                Phone: (347) 495-5316
+              </a>
+              <a
+                href="mailto:plumbnycconsulting@gmail.com"
+                className="text-[#B7B7B7] transition hover:text-white"
+              >
+                Email: plumbnycconsulting@gmail.com
+              </a>
+            </div>
           </div>
           <nav className="justify-self-end w-full md:max-w-[600px] lg:max-w-[562px] xl:max-w-[734px] 2xl:max-w-[839px]">
             <ul className="flex flex-col md:flex-row flex-wrap justify-end md:gap-x-[42px] md:gap-y-[15px] lg:gap-x-[68px] lg:gap-y-[21px] xl:gap-y-12 xl:gap-x-[100px]  gap-[22px] text-left md:text-right">

@@ -121,7 +121,12 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
   }, [renders.length])
 
   useEffect(() => {
-    const currentSlides = openRender !== null ? renders[openRender]?.slides : null
+    const currentSlides =
+      openRender !== null
+        ? renders[openRender]?.slides
+        : renders.length === 1
+          ? renders[0]?.slides
+          : null
 
     if (!currentSlides?.length) {
       setActiveSlide(0)
@@ -171,6 +176,11 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
       return
     }
 
+    if (renders.length === 1) {
+      preloadGallerySlides(renders[0]?.slides ?? [], preloadedGalleryImages.current, activeSlide)
+      return
+    }
+
     preloadGallerySlides(renders[activeRender]?.slides ?? [], preloadedGalleryImages.current)
   }, [activeRender, activeSlide, openRender, renders])
 
@@ -184,7 +194,7 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
       return
     }
 
-    const targetIndex = activeRender
+    const targetIndex = renders.length === 1 ? activeSlide : activeRender
     const activeCard = cardRefs.current[targetIndex]
     if (!activeCard) return
 
@@ -196,6 +206,9 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
   }, [activeRender, activeSlide, renders.length])
 
   if (!renders.length) return null
+
+  const isSingleRender = renders.length === 1
+  const singleRender = isSingleRender ? renders[0] : null
 
   const openedRender = openRender !== null ? renders[openRender] : null
   const openedSlide =
@@ -220,6 +233,18 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
     setActiveRender((current) => (current === renders.length - 1 ? 0 : current + 1))
   }
 
+  const goToPreviousSingleSlide = () => {
+    if (!singleRender) return
+
+    setActiveSlide((current) => (current === 0 ? singleRender.slides.length - 1 : current - 1))
+  }
+
+  const goToNextSingleSlide = () => {
+    if (!singleRender) return
+
+    setActiveSlide((current) => (current === singleRender.slides.length - 1 ? 0 : current + 1))
+  }
+
   const goToPreviousSlide = () => {
     if (!openedRender) return
 
@@ -237,7 +262,28 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
       <section className="mt-[12px] w-full md:mt-[20px] lg:mt-[24px]">
         <div className="mx-auto w-full max-w-[1920px]">
           <div className="relative">
-            {renders.length > 1 ? (
+            {isSingleRender && singleRender && singleRender.slides.length > 1 ? (
+              <>
+                <button
+                  type="button"
+                  aria-label="Previous image"
+                  onClick={goToPreviousSingleSlide}
+                  className="absolute left-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#131313] shadow-md transition hover:bg-white"
+                >
+                  <span className="text-xl leading-none">&lsaquo;</span>
+                </button>
+                <button
+                  type="button"
+                  aria-label="Next image"
+                  onClick={goToNextSingleSlide}
+                  className="absolute right-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#131313] shadow-md transition hover:bg-white"
+                >
+                  <span className="text-xl leading-none">&rsaquo;</span>
+                </button>
+              </>
+            ) : null}
+
+            {!isSingleRender && renders.length > 1 ? (
               <>
                 <button
                   type="button"
@@ -260,54 +306,113 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
 
             <div className="overflow-x-auto px-[10px] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden md:px-[44px]">
               <div className="flex items-stretch gap-[12px] py-1 md:gap-[18px] xl:gap-[22px]">
-                {renders.map((render, index) => (
-                  <button
-                    key={`${render.preview.url}-${index}`}
-                    ref={(element) => {
-                      cardRefs.current[index] = element
-                    }}
-                    type="button"
-                    onPointerEnter={() => preloadGallerySlides(render.slides, preloadedGalleryImages.current)}
-                    onFocus={() => preloadGallerySlides(render.slides, preloadedGalleryImages.current)}
-                    onClick={() => openGallery(index)}
-                    className={`group relative w-[84vw] shrink-0 snap-center overflow-hidden rounded-[20px] border bg-[#F5F5F5] text-left transition duration-300 md:w-[58vw] xl:w-[38vw] ${
-                      index === activeRender
-                        ? 'border-[#131313] shadow-[0_20px_50px_rgba(0,0,0,0.12)]'
-                        : 'border-[#E7E7E7] opacity-80 hover:opacity-100'
-                    }`}
-                  >
-                    {(() => {
-                      const previewVariant = pickMediaVariant(render.preview, ['card', 'tablet', 'desktop'])
-                      const previewSrc = buildPayloadResponsiveSrc(render.preview, ['card', 'tablet', 'desktop'])
+                {isSingleRender && singleRender
+                  ? singleRender.slides.map((slide, index) => (
+                      <button
+                        key={`${slide.url}-${index}`}
+                        ref={(element) => {
+                          cardRefs.current[index] = element
+                        }}
+                        type="button"
+                        onPointerEnter={() =>
+                          preloadGallerySlides(singleRender.slides, preloadedGalleryImages.current, index)
+                        }
+                        onFocus={() =>
+                          preloadGallerySlides(singleRender.slides, preloadedGalleryImages.current, index)
+                        }
+                        onClick={() => openGallery(0, index)}
+                        className={`group relative w-[84vw] shrink-0 snap-center overflow-hidden rounded-[20px] border bg-[#F5F5F5] text-left transition duration-300 md:w-[58vw] xl:w-[38vw] ${
+                          index === activeSlide
+                            ? 'border-[#131313] shadow-[0_20px_50px_rgba(0,0,0,0.12)]'
+                            : 'border-[#E7E7E7] opacity-80 hover:opacity-100'
+                        }`}
+                      >
+                        {(() => {
+                          const slideVariant = pickMediaVariant(slide, ['card', 'tablet', 'desktop'])
+                          const slideSrc = buildPayloadResponsiveSrc(slide, ['card', 'tablet', 'desktop'])
 
-                      if (!previewVariant) return null
+                          if (!slideVariant) return null
 
-                      return (
-                        <div className="relative aspect-[16/10] md:aspect-[16/9]">
-                          <Image
-                            src={previewSrc ?? previewVariant.url}
-                            alt={previewVariant.alt || 'Render preview'}
-                            loader={previewSrc ? payloadResponsiveImageLoader : undefined}
-                            unoptimized={previewSrc ? false : shouldUnoptimizeImage(previewVariant.url)}
-                            fill
-                            sizes="(max-width: 767px) 84vw, (max-width: 1279px) 58vw, 38vw"
-                            className="object-contain transition-transform duration-500 ease-out group-hover:scale-[1.02]"
-                          />
-                        </div>
-                      )
-                    })()}
+                          return (
+                            <div className="relative aspect-[16/10] md:aspect-[16/9]">
+                              <Image
+                                src={slideSrc ?? slideVariant.url}
+                                alt={slideVariant.alt || 'Render image'}
+                                loader={slideSrc ? payloadResponsiveImageLoader : undefined}
+                                unoptimized={slideSrc ? false : shouldUnoptimizeImage(slideVariant.url)}
+                                fill
+                                sizes="(max-width: 767px) 84vw, (max-width: 1279px) 58vw, 38vw"
+                                className="object-contain transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+                              />
+                            </div>
+                          )
+                        })()}
+                      </button>
+                    ))
+                  : renders.map((render, index) => (
+                      <button
+                        key={`${render.preview.url}-${index}`}
+                        ref={(element) => {
+                          cardRefs.current[index] = element
+                        }}
+                        type="button"
+                        onPointerEnter={() => preloadGallerySlides(render.slides, preloadedGalleryImages.current)}
+                        onFocus={() => preloadGallerySlides(render.slides, preloadedGalleryImages.current)}
+                        onClick={() => openGallery(index)}
+                        className={`group relative w-[84vw] shrink-0 snap-center overflow-hidden rounded-[20px] border bg-[#F5F5F5] text-left transition duration-300 md:w-[58vw] xl:w-[38vw] ${
+                          index === activeRender
+                            ? 'border-[#131313] shadow-[0_20px_50px_rgba(0,0,0,0.12)]'
+                            : 'border-[#E7E7E7] opacity-80 hover:opacity-100'
+                        }`}
+                      >
+                        {(() => {
+                          const previewVariant = pickMediaVariant(render.preview, ['card', 'tablet', 'desktop'])
+                          const previewSrc = buildPayloadResponsiveSrc(render.preview, ['card', 'tablet', 'desktop'])
 
-                    {render.slides.length > 1 ? (
-                      <div className="absolute bottom-4 right-4 rounded-full bg-black/70 px-3 py-1 text-[12px] text-white md:text-[14px]">
-                        {render.slides.length} views
-                      </div>
-                    ) : null}
-                  </button>
-                ))}
+                          if (!previewVariant) return null
+
+                          return (
+                            <div className="relative aspect-[16/10] md:aspect-[16/9]">
+                              <Image
+                                src={previewSrc ?? previewVariant.url}
+                                alt={previewVariant.alt || 'Render preview'}
+                                loader={previewSrc ? payloadResponsiveImageLoader : undefined}
+                                unoptimized={previewSrc ? false : shouldUnoptimizeImage(previewVariant.url)}
+                                fill
+                                sizes="(max-width: 767px) 84vw, (max-width: 1279px) 58vw, 38vw"
+                                className="object-contain transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+                              />
+                            </div>
+                          )
+                        })()}
+
+                        {render.slides.length > 1 ? (
+                          <div className="absolute bottom-4 right-4 rounded-full bg-black/70 px-3 py-1 text-[12px] text-white md:text-[14px]">
+                            {render.slides.length} views
+                          </div>
+                        ) : null}
+                      </button>
+                    ))}
               </div>
             </div>
 
-            {renders.length > 1 ? (
+            {isSingleRender && singleRender && singleRender.slides.length > 1 ? (
+              <div className="mt-4 flex items-center justify-center gap-2 text-[#131313]">
+                {singleRender.slides.map((_, index) => (
+                  <button
+                    key={`single-dot-${index}`}
+                    type="button"
+                    aria-label={`Go to image ${index + 1}`}
+                    onClick={() => setActiveSlide(index)}
+                    className={`h-2.5 rounded-full transition-all ${
+                      index === activeSlide ? 'w-8 bg-[#131313]' : 'w-2.5 bg-[#D0D0D0]'
+                    }`}
+                  />
+                ))}
+              </div>
+            ) : null}
+
+            {!isSingleRender && renders.length > 1 ? (
               <div className="mt-4 flex items-center justify-center gap-2 text-[#131313]">
                 {renders.map((_, index) => (
                   <button

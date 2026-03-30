@@ -64,7 +64,11 @@ function preloadGallerySlides(
   if (typeof window === 'undefined' || !slides.length) return
 
   const normalizedIndex = ((priorityIndex % slides.length) + slides.length) % slides.length
-  const orderedSlides = [...slides.slice(normalizedIndex), ...slides.slice(0, normalizedIndex)]
+  const preloadOffsets = [0, 1, -1, 2]
+  const orderedIndices = preloadOffsets
+    .map((offset) => (normalizedIndex + offset + slides.length) % slides.length)
+    .filter((index, currentIndex, allIndices) => allIndices.indexOf(index) === currentIndex)
+  const orderedSlides = orderedIndices.map((index) => slides[index]).filter(Boolean)
 
   orderedSlides.forEach((slide) => {
     const preloadUrl = getGalleryPreloadUrl(slide)
@@ -467,7 +471,7 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
             <div className="relative flex-1 overflow-hidden rounded-[20px] bg-black/20">
               {(() => {
                 const openedVariant = pickMediaVariant(openedSlide, ['desktop', 'tablet', 'card'])
-                const openedSrc = buildPayloadResponsiveSrc(openedSlide, ['card', 'tablet', 'desktop'])
+                const openedSrc = buildPayloadResponsiveSrc(openedSlide, ['tablet', 'desktop'])
 
                 if (!openedVariant) return null
 
@@ -481,7 +485,7 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
                     fill
                     priority
                     fetchPriority="high"
-                    sizes="100vw"
+                    sizes="(max-width: 767px) calc(100vw - 2rem), (max-width: 1279px) calc(100vw - 4rem), 1600px"
                     className="object-contain"
                   />
                 )
@@ -524,6 +528,7 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
                           alt={thumbnailVariant.alt || 'Render gallery thumbnail'}
                           loader={thumbnailSrc ? payloadResponsiveImageLoader : undefined}
                           unoptimized={thumbnailSrc ? false : shouldUnoptimizeImage(thumbnailVariant.url)}
+                          loading="lazy"
                           width={thumbnailVariant.width || 140}
                           height={thumbnailVariant.height || 96}
                           className="h-[72px] w-[108px] object-cover md:h-[84px] md:w-[126px]"

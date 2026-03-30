@@ -64,16 +64,18 @@ export function buildPayloadResponsiveSrc(
 
   if (!fallback) return null
 
-  const candidates = dedupeCandidates(
+  const responsiveCandidates = dedupeCandidates(
     preferredSizes
       .map((sizeName) => normalizeCandidate(media?.sizes?.[sizeName]))
       .filter((candidate): candidate is PayloadResponsiveCandidate => Boolean(candidate)),
   )
 
+  const candidates = responsiveCandidates.length ? responsiveCandidates : [fallback]
+
   return `${PAYLOAD_RESPONSIVE_PREFIX}${encodeURIComponent(
     JSON.stringify({
       fallback,
-      candidates: dedupeCandidates([...candidates, fallback]),
+      candidates,
     } satisfies PayloadResponsiveImageConfig),
   )}`
 }

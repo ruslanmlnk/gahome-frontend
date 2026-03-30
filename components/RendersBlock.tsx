@@ -2,10 +2,6 @@
 
 import Image from 'next/image'
 import { pickMediaVariant, type MediaWithSizes } from '@/src/lib/pickMediaVariant'
-import {
-  buildPayloadResponsiveSrc,
-  payloadResponsiveImageLoader,
-} from '@/src/lib/payloadResponsiveImage'
 import { resolveMediaUrl } from '@/src/lib/resolveMediaUrl'
 import { shouldUnoptimizeImage } from '@/src/lib/shouldUnoptimizeImage'
 import { useEffect, useMemo, useRef, useState, type JSX } from 'react'
@@ -53,7 +49,7 @@ function dedupeImages(images: RenderImage[]): RenderImage[] {
 }
 
 function getGalleryPreloadUrl(slide?: RenderImage | null): string | null {
-  return pickMediaVariant(slide, ['desktop', 'tablet', 'card'])?.url ?? resolveMediaUrl(slide?.url)
+  return pickMediaVariant(slide, ['tablet', 'desktop', 'card'])?.url ?? resolveMediaUrl(slide?.url)
 }
 
 function preloadGallerySlides(
@@ -110,6 +106,7 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
   const [activeRender, setActiveRender] = useState(0)
   const [openRender, setOpenRender] = useState<number | null>(null)
   const [activeSlide, setActiveSlide] = useState(0)
+  const [loadedModalSlides, setLoadedModalSlides] = useState<Record<string, true>>({})
   const cardRefs = useRef<Array<HTMLButtonElement | null>>([])
   const preloadedGalleryImages = useRef(new Set<string>())
 
@@ -219,6 +216,9 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
     openedRender && openedRender.slides.length
       ? openedRender.slides[Math.min(activeSlide, openedRender.slides.length - 1)]
       : null
+  const openedHighResVariant = pickMediaVariant(openedSlide, ['tablet', 'desktop', 'card'])
+  const openedLowResVariant = pickMediaVariant(openedSlide, ['card', 'thumbnail', 'tablet', 'desktop'])
+  const isOpenedHighResLoaded = openedHighResVariant ? Boolean(loadedModalSlides[openedHighResVariant.url]) : false
 
   const showGalleryNav = Boolean(openedRender && openedRender.slides.length > 1)
 
@@ -333,17 +333,15 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
                       >
                         {(() => {
                           const slideVariant = pickMediaVariant(slide, ['card', 'tablet', 'desktop'])
-                          const slideSrc = buildPayloadResponsiveSrc(slide, ['card', 'tablet', 'desktop'])
 
                           if (!slideVariant) return null
 
                           return (
                             <div className="relative aspect-[16/10] md:aspect-[16/9]">
                               <Image
-                                src={slideSrc ?? slideVariant.url}
+                                src={slideVariant.url}
                                 alt={slideVariant.alt || 'Render image'}
-                                loader={slideSrc ? payloadResponsiveImageLoader : undefined}
-                                unoptimized={slideSrc ? false : shouldUnoptimizeImage(slideVariant.url)}
+                                unoptimized={shouldUnoptimizeImage(slideVariant.url)}
                                 fill
                                 sizes="(max-width: 767px) 84vw, (max-width: 1279px) 58vw, 38vw"
                                 className="object-contain transition-transform duration-500 ease-out group-hover:scale-[1.02]"
@@ -371,17 +369,15 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
                       >
                         {(() => {
                           const previewVariant = pickMediaVariant(render.preview, ['card', 'tablet', 'desktop'])
-                          const previewSrc = buildPayloadResponsiveSrc(render.preview, ['card', 'tablet', 'desktop'])
 
                           if (!previewVariant) return null
 
                           return (
                             <div className="relative aspect-[16/10] md:aspect-[16/9]">
                               <Image
-                                src={previewSrc ?? previewVariant.url}
+                                src={previewVariant.url}
                                 alt={previewVariant.alt || 'Render preview'}
-                                loader={previewSrc ? payloadResponsiveImageLoader : undefined}
-                                unoptimized={previewSrc ? false : shouldUnoptimizeImage(previewVariant.url)}
+                                unoptimized={shouldUnoptimizeImage(previewVariant.url)}
                                 fill
                                 sizes="(max-width: 767px) 84vw, (max-width: 1279px) 58vw, 38vw"
                                 className="object-contain transition-transform duration-500 ease-out group-hover:scale-[1.02]"
@@ -469,27 +465,42 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
 
           <div className="mx-auto flex h-full w-full max-w-[1600px] flex-col justify-center gap-4">
             <div className="relative flex-1 overflow-hidden rounded-[20px] bg-black/20">
-              {(() => {
-                const openedVariant = pickMediaVariant(openedSlide, ['desktop', 'tablet', 'card'])
-                const openedSrc = buildPayloadResponsiveSrc(openedSlide, ['tablet', 'desktop'])
+              {openedLowResVariant ? (
+                <Image
+                  key={`${openedLowResVariant.url}-low`}
+                  src={openedLowResVariant.url}
+                  alt={openedLowResVariant.alt || 'Render gallery image'}
+                  unoptimized={shouldUnoptimizeImage(openedLowResVariant.url)}
+                  fill
+                  priority
+                  fetchPriority="high"
+                  className={`object-contain transition-opacity duration-200 ${
+                    isOpenedHighResLoaded ? 'opacity-0' : 'opacity-100'
+                  }`}
+                />
+              ) : null}
 
-                if (!openedVariant) return null
-
-                return (
-                  <Image
-                    key={openedSlide.url}
-                    src={openedSrc ?? openedVariant.url}
-                    alt={openedVariant.alt || 'Render gallery image'}
-                    loader={openedSrc ? payloadResponsiveImageLoader : undefined}
-                    unoptimized={openedSrc ? false : shouldUnoptimizeImage(openedVariant.url)}
-                    fill
-                    priority
-                    fetchPriority="high"
-                    sizes="(max-width: 767px) calc(100vw - 2rem), (max-width: 1279px) calc(100vw - 4rem), 1600px"
-                    className="object-contain"
-                  />
-                )
-              })()}
+              {openedHighResVariant ? (
+                <Image
+                  key={`${openedHighResVariant.url}-high`}
+                  src={openedHighResVariant.url}
+                  alt={openedHighResVariant.alt || 'Render gallery image'}
+                  unoptimized={shouldUnoptimizeImage(openedHighResVariant.url)}
+                  onLoad={() =>
+                    setLoadedModalSlides((current) =>
+                      current[openedHighResVariant.url]
+                        ? current
+                        : { ...current, [openedHighResVariant.url]: true },
+                    )
+                  }
+                  fill
+                  priority
+                  fetchPriority="high"
+                  className={`object-contain transition-opacity duration-200 ${
+                    isOpenedHighResLoaded ? 'opacity-100' : 'opacity-0'
+                  }`}
+                />
+              ) : null}
             </div>
 
             <div className="flex items-center justify-between text-white">
@@ -518,16 +529,14 @@ export default function RendersBlock({ items }: { items?: RenderItem[] | null })
                   >
                     {(() => {
                       const thumbnailVariant = pickMediaVariant(slide, ['thumbnail', 'card', 'tablet'])
-                      const thumbnailSrc = buildPayloadResponsiveSrc(slide, ['thumbnail', 'card', 'tablet'])
 
                       if (!thumbnailVariant) return null
 
                       return (
                         <Image
-                          src={thumbnailSrc ?? thumbnailVariant.url}
+                          src={thumbnailVariant.url}
                           alt={thumbnailVariant.alt || 'Render gallery thumbnail'}
-                          loader={thumbnailSrc ? payloadResponsiveImageLoader : undefined}
-                          unoptimized={thumbnailSrc ? false : shouldUnoptimizeImage(thumbnailVariant.url)}
+                          unoptimized={shouldUnoptimizeImage(thumbnailVariant.url)}
                           loading="lazy"
                           width={thumbnailVariant.width || 140}
                           height={thumbnailVariant.height || 96}
